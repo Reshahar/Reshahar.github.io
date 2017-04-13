@@ -34,7 +34,7 @@
 <meta property="og:image" content="http://img.blog.csdn.net/20170309222222816?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170309222300738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170309222319148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-04-13T05:35:26.000Z">
+<meta property="og:updated_time" content="2017-04-13T13:28:56.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="堆溢出（一）堆结构">
 <meta name="twitter:description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
@@ -135,7 +135,7 @@
 </ul>
 <p>###0x001 堆中的数据结构</p>
 <ol>
-<li>堆块<br>1）    堆块分为块首和块身<br>2）    块首大小为（8字节）<br><img src="http://img.blog.csdn.net/20170308221103759?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>注：flag 01 表示堆块占用<br>3）    空闲态的堆块在块首后有两个指针 </li>
+<li>堆块<br>1）    堆块分为块首和块身<br>2）    块首大小为（8字节）<br><img src="http://img.blog.csdn.net/20170308221103759?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>注：flag 01 表示堆块占用<br>3）    空闲态的堆块在块首后有两个指针 </li>
 <li>堆表（空表和快表）<br>1）    空表：双向回环链表<br>2）    快表：单向链表<br>3）    区别<br>a)    以上两个都为128大小的指针数组 （空表每一项有两个指针，快表每一项有一个指针）<br>b)    快表最多只有四个节点<br>c)    空表除了数组的第一个元素外其他分别链接：数组下标*8 大小的堆块，数组的第一个元素链接着大于1kb的堆块，并升序排序<br>d)    快表的堆块处于占用状态，不会发生堆块合并<br>e)    快表的只存在精确分配，快表优先空表分配</li>
 <li>内存块的大小</li>
 <li>小块（小于1kb）<br>分配方式：优先快表，其次空表非零元素（free[0]），然后堆缓存，最后空表零元素</li>
@@ -150,29 +150,29 @@
 <p>2）只有空表的堆块分配</p>
 <p>a)    在VC++6.0中编译成release版本，同时设置OD为默认调试器，再运行程序会崩溃（int 3断点，为了防止调试堆），这时候已经调用HeapCreate函数创建了一个堆，通过看函数的返回值可以确定堆堆区的起始位置</p>
 <p>b)     通过OD 可以跳转到这块堆区（在偏移0x178）的位置是空表的头，如图可以看到，当前的free[0]的值是0x00360680，而其他元素都是指向自身的。</p>
-<p><img src="http://img.blog.csdn.net/20170309221447245?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>c）通过OD跳转到0x00360680的位置可以看到，红色的部分是一个堆块大小为0x130<br> <img src="http://img.blog.csdn.net/20170309221527204?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>d）继续单步运行程序，直到分配完四个堆块全部分配完毕，如下<br> <img src="http://img.blog.csdn.net/20170309221602012?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>结合堆块的结构和源代码可以清楚的看出来图中选中的部分是源代码中所分配的内存块 ，各个红色框就是源代码中h1,h2,h3,h4所分配的内存块（要分配的内存不够8的倍数，向上取八的倍数）</p>
+<p><img src="http://img.blog.csdn.net/20170309221447245?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+<p>c）通过OD跳转到0x00360680的位置可以看到，红色的部分是一个堆块大小为0x130<br> <img src="http://img.blog.csdn.net/20170309221527204?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+<p>d）继续单步运行程序，直到分配完四个堆块全部分配完毕，如下<br> <img src="http://img.blog.csdn.net/20170309221602012?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>结合堆块的结构和源代码可以清楚的看出来图中选中的部分是源代码中所分配的内存块 ，各个红色框就是源代码中h1,h2,h3,h4所分配的内存块（要分配的内存不够8的倍数，向上取八的倍数）</p>
 <p>3）只有空表的堆块释放</p>
-<p>a)    单步运行，释放掉第一个堆块，堆中变化如下<br> <img src="http://img.blog.csdn.net/20170309221634794?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>红色框中的就是h1释放以后的内存块，可以看到释放后他将链接到0x00360188的位置，也就是空表中的free[2] （问题1）</p>
-<p>b)     继续释放h3，结果如下，释放后的内存块链接到0x00360198的位置，也就是free[4]<br> <img src="http://img.blog.csdn.net/20170309221701221?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>a)    单步运行，释放掉第一个堆块，堆中变化如下<br> <img src="http://img.blog.csdn.net/20170309221634794?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>红色框中的就是h1释放以后的内存块，可以看到释放后他将链接到0x00360188的位置，也就是空表中的free[2] （问题1）</p>
+<p>b)     继续释放h3，结果如下，释放后的内存块链接到0x00360198的位置，也就是free[4]<br> <img src="http://img.blog.csdn.net/20170309221701221?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>c)    在释放掉h2 由于，内存相连将会发生堆块合并，如图可以看到，释放过后，h1,h2,h3，发生了合并，形成了选中部分的一块，修改了块大小，修改了链接位置0x003601B8也就是free[8]</p>
-<p>d)     将最后一块内存释放，内存再一次合并，恢复最开始的形态，链接到0x00360178也是就free[0]<br> <img src="http://img.blog.csdn.net/20170309221750093?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>d)     将最后一块内存释放，内存再一次合并，恢复最开始的形态，链接到0x00360178也是就free[0]<br> <img src="http://img.blog.csdn.net/20170309221750093?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>2.快表的结构验证</p>
 <p>1）    验证代码</p>
 <figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;windows.h&gt;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">	HLOCAL h1,h2,h3,h4,h5,h6,h7;</div><div class="line">	HANDLE hp;</div><div class="line"></div><div class="line">	hp = HeapCreate(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>); <span class="comment">//堆创建带有快表的</span></div><div class="line">	</div><div class="line">	__asm int <span class="number">3</span></div><div class="line"></div><div class="line">	<span class="comment">//快表结构的验证</span></div><div class="line"></div><div class="line">	h1 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);  <span class="comment">//申请内存,以构成快表</span></div><div class="line">	h2 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h3 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">24</span>);</div><div class="line">	h4 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">24</span>);</div><div class="line"></div><div class="line">	HeapFree(hp,<span class="number">0</span>,h1);	<span class="comment">//释放掉申请的内存，以构成快表（因为快表初始化是空的，而且不会发生堆块合并）</span></div><div class="line">	HeapFree(hp,<span class="number">0</span>,h2);	</div><div class="line">	HeapFree(hp,<span class="number">0</span>,h3);  </div><div class="line">	HeapFree(hp,<span class="number">0</span>,h4);</div><div class="line"></div><div class="line">	<span class="comment">//堆分配顺序的验证</span></div><div class="line"></div><div class="line">	h1 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);  <span class="comment">//再申请6块内存(前两块会从快表中分配)</span></div><div class="line">	h2 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h3 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h4 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h5 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h6 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	</div><div class="line">	HeapFree(hp,<span class="number">0</span>,h1);	<span class="comment">//释放掉申请的内存</span></div><div class="line">	HeapFree(hp,<span class="number">0</span>,h2);	</div><div class="line">	HeapFree(hp,<span class="number">0</span>,h3); </div><div class="line">	HeapFree(hp,<span class="number">0</span>,h4); <span class="comment">//快表对应项以满</span></div><div class="line">	HeapFree(hp,<span class="number">0</span>,h5); <span class="comment">//会连接到空表的free[2],因为快表只能有4项,并且h5没有释放因此没有发生堆块合并，不会连接到free[0]</span></div><div class="line"></div><div class="line"></div><div class="line">	h1 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);  <span class="comment">//会从快表分配而不会从空表分配</span></div><div class="line">	h2 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h3 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line">	h4 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);</div><div class="line"></div><div class="line">	h5 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">8</span>);	<span class="comment">//会从空表分配</span></div><div class="line">	h7 = HeapAlloc(hp,HEAP_ZERO_MEMORY,<span class="number">16</span>);	<span class="comment">//会从空表分配(快表对应Look[3]的项为空)	</span></div><div class="line"></div><div class="line">	HeapDestroy(hp); <span class="comment">//堆销毁</span></div><div class="line"></div><div class="line">	return <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>2) 快表结构验证</p>
-<p>a)     使用VC++6.0编译程序release版本并运行，程序崩溃，使用OD调试，段在堆创建之后，和上面的一样，可以看到空表的第零项不是上次的0x00360688,因为快表占了这个位置，我们可以跳转到0x00360688的位置查看一下<br> <img src="http://img.blog.csdn.net/20170309221907424?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>a)     使用VC++6.0编译程序release版本并运行，程序崩溃，使用OD调试，段在堆创建之后，和上面的一样，可以看到空表的第零项不是上次的0x00360688,因为快表占了这个位置，我们可以跳转到0x00360688的位置查看一下<br> <img src="http://img.blog.csdn.net/20170309221907424?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>b)    堆刚创建快表是空的</p>
-<p>c)    单步执行程序，分配内存块，再释放掉刚申请的内存，由于，优先将内存链接到快表中，所以可以看到如下图的情况，第一个红色的框是lookaside[2],第二个红色的框是lookaside[4]（问题2），因为代码中申请的是两个8个字节大小的内存块，和两个24字节大小的内存块，释放后，会分别链接到对应的lookaside数组中。<br> <img src="http://img.blog.csdn.net/20170309221955847?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>d)    转到0x00361e88的内存，可以看到快表中的flag都是01（占用状态），所以快表中的堆块不会发生合并。<br> <img src="http://img.blog.csdn.net/20170309222027784?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>c)    单步执行程序，分配内存块，再释放掉刚申请的内存，由于，优先将内存链接到快表中，所以可以看到如下图的情况，第一个红色的框是lookaside[2],第二个红色的框是lookaside[4]（问题2），因为代码中申请的是两个8个字节大小的内存块，和两个24字节大小的内存块，释放后，会分别链接到对应的lookaside数组中。<br> <img src="http://img.blog.csdn.net/20170309221955847?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+<p>d)    转到0x00361e88的内存，可以看到快表中的flag都是01（占用状态），所以快表中的堆块不会发生合并。<br> <img src="http://img.blog.csdn.net/20170309222027784?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>3）    堆分配和释放的顺序的验证</p>
-<p>a)    继续调试上面的程序，再次申请6块8字节大小的内存块，由于前面申请过2块8字节大小的内存块，所有前两次的分配如下图，快表中的内存被再次分配出去，快表再次变成空。<br> <img src="http://img.blog.csdn.net/20170309222116020?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>b)     再次，申请就会从free[0],中进行分配，再将他们前四块释放掉，这时候快表中lookaside[2]对应的项就会装满，跟随lookaside[2]中的链表头，可以找到对应的四个节点，如下面第二个图中四个红框所示<br> <img src="http://img.blog.csdn.net/20170309222140911?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br> <img src="http://img.blog.csdn.net/20170309222200332?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>c)    继续释放，如图可以看到，h5这块内存被链接到了free[2]对应的位置中<br> <img src="http://img.blog.csdn.net/20170309222222816?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>a)    继续调试上面的程序，再次申请6块8字节大小的内存块，由于前面申请过2块8字节大小的内存块，所有前两次的分配如下图，快表中的内存被再次分配出去，快表再次变成空。<br> <img src="http://img.blog.csdn.net/20170309222116020?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+<p>b)     再次，申请就会从free[0],中进行分配，再将他们前四块释放掉，这时候快表中lookaside[2]对应的项就会装满，跟随lookaside[2]中的链表头，可以找到对应的四个节点，如下面第二个图中四个红框所示<br> <img src="http://img.blog.csdn.net/20170309222140911?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br> <img src="http://img.blog.csdn.net/20170309222200332?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+<p>c)    继续释放，如图可以看到，h5这块内存被链接到了free[2]对应的位置中<br> <img src="http://img.blog.csdn.net/20170309222222816?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>d)    再次申请四块内存，如图可以以看到空表中并没有变化，由此可以证明，这四块内存是从快表中分配的。</p>
-<p>e)    再次分配第五快内存，这次是从空表中free[2]中分配的。<br> <img src="http://img.blog.csdn.net/20170309222300738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>f)    再次分配，一块16字节大小的内存块之后，堆中变化如下图（选中部分为新分配的内存块），因为快表中lookaside[3]为空，并且空表free[3]也为空，所有从free[0]中”切割”出现”找零钱”现象。<br> <img src="http://img.blog.csdn.net/20170309222319148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>e)    再次分配第五快内存，这次是从空表中free[2]中分配的。<br> <img src="http://img.blog.csdn.net/20170309222300738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
+<p>f)    再次分配，一块16字节大小的内存块之后，堆中变化如下图（选中部分为新分配的内存块），因为快表中lookaside[3]为空，并且空表free[3]也为空，所有从free[0]中”切割”出现”找零钱”现象。<br> <img src="http://img.blog.csdn.net/20170309222319148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>4）     堆表分配和释放总结<br>由以上实验证明，在有快表的时候，分配小块内存，优先分配快表，再在空表中分配，释放与分配相反，优先链接快表，在快表满了以后，在链接空表。在没有快表的时候，直接使用空表分配，释放后链接到空表中。</p>
 <p>###0x003总结和分析</p>
 <p>通过两次的实验可以巩固对堆结构的理解和堆管理的方式的学习，为下一步的堆溢出做准备，通过自己的理解去构造程序去分析堆结构，可以进一步的加深自己对知识的理解。<br>注：<br>问题1：<br>对堆结构的分析发现不管是空表还是块表free[1]好像都没有被用到，不会有堆块链接到上面（这是我的疑问没有得出结果）。<br>问题2：<br>lookaside[1]链接的到底是8字节大小的堆块，还是16字节大小的，这个需要读了WRK源码可能才会知道。</p>
@@ -214,9 +214,9 @@
  
 
 <div class="next">
-<a href="/2017/04/13/堆溢出（二）空表溢出/"  title="堆溢出（二）空表溢出">
+<a href="/2017/04/13/堆溢出（二）空表DWORD SHOOT/"  title="堆溢出（二）空表 DWORD SHOOT">
  <strong>下一篇：</strong><br/> 
- <span>堆溢出（二）空表溢出
+ <span>堆溢出（二）空表 DWORD SHOOT
 </span>
 </a>
 </div>
@@ -248,7 +248,15 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>2</sup></a></li>
+			<li><a href="/categories/其它/" title="其它">其它<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/逆向工程/" title="逆向工程">逆向工程<sup>2</sup></a></li>
 		  
 		
 		</ul>
@@ -261,7 +269,23 @@
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/漏洞/" title="漏洞">漏洞<sup>2</sup></a></li>
+				<li><a href="/tags/漏洞/" title="漏洞">漏洞<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/漏洞-溢出/" title="漏洞 溢出">漏洞 溢出<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-gcc/" title="linux gcc">linux gcc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向-ctf/" title="逆向 ctf">逆向 ctf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向-脱壳/" title="逆向 脱壳">逆向 脱壳<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -322,7 +346,7 @@
 		
 		
 		&nbsp
-		<span id="busuanzi_container_site_uv" style="display:none"> 
+		<span id="busuanzi_container_site_uv" > 
   		Total <span id="busuanzi_value_site_uv"></span> views.
 		</span>
 

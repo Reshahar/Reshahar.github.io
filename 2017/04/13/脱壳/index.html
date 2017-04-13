@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>堆溢出（二）空表溢出 | Reshahar的博客</title>
+    <title>脱壳 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
-<meta name="keywords" content="漏洞">
+    <meta name="description" content="本文章讲述了脱壳的常用方法">
+<meta name="keywords" content="逆向 脱壳">
 <meta property="og:type" content="article">
-<meta property="og:title" content="堆溢出（二）空表溢出">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/堆溢出（二）空表溢出/index.html">
+<meta property="og:title" content="脱壳">
+<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/脱壳/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
-<meta property="og:updated_time" content="2017-04-13T09:43:03.000Z">
+<meta property="og:description" content="本文章讲述了脱壳的常用方法">
+<meta property="og:updated_time" content="2017-04-13T13:58:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="堆溢出（二）空表溢出">
-<meta name="twitter:description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
+<meta name="twitter:title" content="脱壳">
+<meta name="twitter:description" content="本文章讲述了脱壳的常用方法">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/13/堆溢出（二）空表溢出/" title="堆溢出（二）空表溢出" itemprop="url">堆溢出（二）空表溢出</a>
+      <a href="/2017/04/13/脱壳/" title="脱壳" itemprop="url">脱壳</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T06:04:33.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+    <time datetime="2017-04-13T13:54:24.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -107,10 +107,16 @@
 		
 		</div>
 		
-		<p>本系列文章讲述了windows 2000 下 堆溢出的方法</p>
+		<p>本文章讲述了脱壳的常用方法</p>
 <hr>
 <a id="more"></a>
-<p>asdasda</p>
+<p>常用方法</p>
+<p>esp定律<br>    先步过<br>    然后esp地址跟随<br>    然后选择硬件断点-&gt;word<br>    然后运行，根据运行情况进行判断<br>    找到oep<br>映像起点：<br>    查找内存<br>    查看堆栈调用</p>
+<p>最后进行将镜像dump下来  用loadPE  矫正映像大小 然后完全转存<br>修复输入表        用importREC</p>
+<p>手动查到IAT地址<br>    寻找API函数 跟随找到起始地址 计算大小</p>
+<p>修改区段名  用loadPE</p>
+<p>PE头修改程序  处理方法<br>    设置事件 系统断点   然后查看mem   在PE头设置断点<br>    alt+f9  运行到用户代码   然后单步找到oep 最后进行脱壳</p>
+<p>附加数据的处理<br>    查找到当前程序最后一个区段的结束位置<br>    用WinHex 打开程序  跳转地址复制<br>    然后将复制的数据复制到你修复的程序最后</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,13 +124,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/漏洞基础/">漏洞基础</a>
+  <a class="article-category-link" href="/categories/逆向工程/">逆向工程</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/漏洞/">漏洞</a>
+  <span></span> <a href="/tags/逆向-脱壳/">逆向 脱壳</a>
   </div>
 
 </div>
@@ -133,7 +139,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/13/堆溢出（二）空表溢出/" data-title="堆溢出（二）空表溢出 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/04/13/脱壳/" data-title="脱壳 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -147,13 +153,21 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/12/堆溢出（一）堆结构/" title="堆溢出（一）堆结构">
+ <a href="/2017/04/13/Kali 64位 安装32位库并编译程序/" title="Kali 64位 安装32位库并编译程序">
   <strong>上一篇：</strong><br/>
   <span>
-  堆溢出（一）堆结构</span>
+  Kali 64位 安装32位库并编译程序</span>
 </a>
 </div>
 
+
+<div class="next">
+<a href="/2017/04/13/一个简单的逆向/"  title="一个简单的逆向">
+ <strong>下一篇：</strong><br/> 
+ <span>一个简单的逆向
+</span>
+</a>
+</div>
 
 </nav>
 
@@ -182,7 +196,15 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>2</sup></a></li>
+			<li><a href="/categories/其它/" title="其它">其它<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/逆向工程/" title="逆向工程">逆向工程<sup>2</sup></a></li>
 		  
 		
 		</ul>
@@ -195,7 +217,23 @@
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/漏洞/" title="漏洞">漏洞<sup>2</sup></a></li>
+				<li><a href="/tags/漏洞/" title="漏洞">漏洞<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/漏洞-溢出/" title="漏洞 溢出">漏洞 溢出<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-gcc/" title="linux gcc">linux gcc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向-ctf/" title="逆向 ctf">逆向 ctf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向-脱壳/" title="逆向 脱壳">逆向 脱壳<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -256,7 +294,7 @@
 		
 		
 		&nbsp
-		<span id="busuanzi_container_site_uv" style="display:none"> 
+		<span id="busuanzi_container_site_uv" > 
   		Total <span id="busuanzi_value_site_uv"></span> views.
 		</span>
 
