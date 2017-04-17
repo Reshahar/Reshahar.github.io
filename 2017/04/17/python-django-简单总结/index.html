@@ -4,38 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>linux x86 栈溢出 | Reshahar的博客</title>
+    <title>python django 简单总结 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="linux x86 栈溢出">
-<meta name="keywords" content="漏洞,溢出">
+    <meta name="description" content="python django 的一些小问题的解决办法">
+<meta name="keywords" content="python,django">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux x86 栈溢出">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/Linux x86 栈溢出/index.html">
+<meta property="og:title" content="python django 简单总结">
+<meta property="og:url" content="http://Reshahar.github.io/2017/04/17/python-django-简单总结/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="linux x86 栈溢出">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211316568">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211328502">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211420894">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211430209">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211442943">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211455660">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211628084">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211639896">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211711305">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212147591">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212136870">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212129651">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212119604">
-<meta property="og:updated_time" content="2017-04-13T14:08:13.000Z">
+<meta property="og:description" content="python django 的一些小问题的解决办法">
+<meta property="og:updated_time" content="2017-04-17T08:55:57.724Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux x86 栈溢出">
-<meta name="twitter:description" content="linux x86 栈溢出">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20161202211316568">
+<meta name="twitter:title" content="python django 简单总结">
+<meta name="twitter:description" content="python django 的一些小问题的解决办法">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -96,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/13/Linux x86 栈溢出/" title="linux x86 栈溢出" itemprop="url">linux x86 栈溢出</a>
+      <a href="/2017/04/17/python-django-简单总结/" title="python django 简单总结" itemprop="url">python django 简单总结</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T14:01:24.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+    <time datetime="2017-04-17T08:48:11.000Z" itemprop="datePublished"> 发表于 2017-04-17</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -121,28 +107,37 @@
 		
 		</div>
 		
-		<p>linux x86 栈溢出</p>
-<hr>
+		<p>python django 的一些小问题的解决办法</p>
 <a id="more"></a>
-<p>环境：<br>1.系统kali linux x64<br>2.开发环境c语言<br>工具：<br>1.Gcc<br>2.Python<br>3.Pwntools<br>4.gdb<br>无防护下的栈溢出<br>1.漏洞程序源代码<br>//Flow.c 源代码<br> <img src="http://img.blog.csdn.net/20161202211316568" alt=""><br>2.编译并关闭dep和栈保护<br>gcc -fno-stack-protector -z execsatck -m32 -o stack1 Flow.c<br> <img src="http://img.blog.csdn.net/20161202211328502" alt=""><br>3.关闭ASLR<br> 运行./close_aslr.sh<br>4.先生成一个字符串（使用pattern.py)<br> <img src="http://img.blog.csdn.net/20161202211420894" alt=""><br>5.运行stack1，输入刚才生成的字符串，栈崩溃了<br>     <img src="http://img.blog.csdn.net/20161202211430209" alt=""><br>6.gdb调试<br><img src="http://img.blog.csdn.net/20161202211442943" alt="">   </p>
-<ol>
-<li>计算偏移位置<br><img src="http://img.blog.csdn.net/20161202211455660" alt=""><br>8.重新生成长度为140的字符串再加上四个‘B’再次使用gdb调试可以看到崩溃的地址是0x42424242这正是“BBBB”的ASCII值<br><img src="http://img.blog.csdn.net/20161202211628084" alt=""><br>9.查看缓冲区开始的地址<br>x/20x $esp-144 或者 x/20s $esp-144 可以得到缓冲区的开始位置<br><img src="http://img.blog.csdn.net/20161202211639896" alt=""><br>10.实际上这些地址都是gdb的调试地址，实际程序运行的地址并不是这些，实际的地址可以通过调试core获取，linux下默认是关闭的，可以通过ulimit -c查看，返回0即为关闭可以通过ulimit -c unlimited 设置成无限大小(仅限本终端)，（永久生效在/etc/profile中写入 source 立即失效）<br>在设置一下core生成的位置echo ‘/core/core<em>%e</em>%p’&gt; /proc/sys/kernel/core_pattern<br>(路径必须存在)<br>11.再次运行stack1，输入140<em>‘A’+4</em>‘B’可以看到生成了core dump<br><img src="http://img.blog.csdn.net/20161202211711305" alt=""><br>12.运行gdb 调试附加stack1和生成的core文件，可以看到断在0x42424242也就是BBBB<br><img src="http://img.blog.csdn.net/20161202212147591" alt=""><br>13.查看一下缓冲区的开始地址为0xffffccd0（不同机子可能不一样）<br><img src="http://img.blog.csdn.net/20161202212136870" alt=""><br>14.找一个shellcode<br><img src="http://img.blog.csdn.net/20161202212129651" alt=""><br>15.运行一个看一下效果，拿下shell<br><img src="http://img.blog.csdn.net/20161202212119604" alt=""></li>
-</ol>
-<p>总结：<br>    这是在没有防护下的栈溢出，在防护下怎绕过，将在下次带给大家！！！</p>
-  
+<hr>
+<p>1.创建网站</p>
+<pre><code>django-admin startproject 项目名
+</code></pre><p>2.创建一个app(创建完网站先进入网站的目录)</p>
+<pre><code>django-admin startapp app名
+</code></pre><p>3.运行网站</p>
+<pre><code>python manage.py runserver 地址:端口
+</code></pre><p>4.导入已经存在的数据库</p>
+<pre><code>python manage.py inspectdb &gt;App路径/models.py
+</code></pre><p>5.将models中的类生成migrations（适用于自己写model在导入数据库）</p>
+<pre><code>python manage.py makemigrations
+将上面生成的结果导入数据库
+python manage.py migrate
+</code></pre><p>6.自定义自增主键</p>
+<pre><code>在自己要定义的自增主键中添加（primary_key=True）
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/漏洞基础/">漏洞基础</a>
+  <a class="article-category-link" href="/categories/web/">web</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/漏洞/">漏洞</a><a href="/tags/溢出/">溢出</a>
+  <span></span> <a href="/tags/python/">python</a><a href="/tags/django/">django</a>
   </div>
 
 </div>
@@ -151,7 +146,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/13/Linux x86 栈溢出/" data-title="linux x86 栈溢出 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/04/17/python-django-简单总结/" data-title="python django 简单总结 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -165,21 +160,13 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/一个简单的逆向/" title="一个简单的逆向">
+ <a href="/2017/04/13/Linux x86 栈溢出/" title="linux x86 栈溢出">
   <strong>上一篇：</strong><br/>
   <span>
-  一个简单的逆向</span>
+  linux x86 栈溢出</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/04/17/python-django-简单总结/"  title="python django 简单总结">
- <strong>下一篇：</strong><br/> 
- <span>python django 简单总结
-</span>
-</a>
-</div>
 
 </nav>
 
