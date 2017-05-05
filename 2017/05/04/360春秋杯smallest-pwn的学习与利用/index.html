@@ -18,7 +18,7 @@
 <meta property="og:url" content="http://Reshahar.github.io/2017/05/04/360春秋杯smallest-pwn的学习与利用/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
 <meta property="og:description" content="360春秋杯smallest-pwn的学习与利用">
-<meta property="og:updated_time" content="2017-05-05T08:49:39.000Z">
+<meta property="og:updated_time" content="2017-05-05T12:08:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="360春秋杯smallest-pwn的学习与利用">
 <meta name="twitter:description" content="360春秋杯smallest-pwn的学习与利用">
@@ -110,7 +110,7 @@
 		<p>360春秋杯smallest-pwn的学习与利用</p>
 <hr>
 <a id="more"></a>
-<h3 id="0x00-序"><a href="#0x00-序" class="headerlink" title="0x00 序"></a>0x00 序</h3><p>这上个月的360春秋杯线上比赛中的一个pwn题，当时比赛的时候虽然漏洞非常明显，<br>但是还是没有任何思路去利用，后来看到wp后才了解到利用的方法，wp中介绍了思路没有exp，<br>我自己尝试着做了一遍，写了一个exp，作为pwn的新手，仅仅希望给新手一个帮助，也为自己做一个记录</p>
+<h3 id="0x00-序"><a href="#0x00-序" class="headerlink" title="0x00 序"></a>0x00 序</h3><p>这是上个月的360春秋杯线上比赛中的一个pwn题，当时比赛的时候虽然漏洞非常明显，<br>但是还是没有任何思路去利用，后来看到wp后才了解到利用的方法，wp中介绍了思路没有exp，<br>我自己尝试着做了一遍，写了一个exp，作为pwn的新手，仅仅希望给新手一个帮助，也为自己做一个记录</p>
 <p>题目文件：<br><a href="https://github.com/Reshahar/BlogFile/blob/master/smallest/smallest" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/blob/master/smallest/smallest</a></p>
 <h3 id="0x01-漏洞分析"><a href="#0x01-漏洞分析" class="headerlink" title="0x01 漏洞分析"></a>0x01 漏洞分析</h3><p>首先将程序smallest放到ida中，很快就分析结束了，因为程序非常小，人如其名,具体如下：</p>
 <pre><code>.text:00000000004000B0 start           proc near
@@ -230,7 +230,7 @@ RELRO     : disabled
 <p>其中re_Sigreturn这是一个系统调用，它会将这个结构体数据恢复到相应寄存器中，我们可以替换rip的值来控制程序流程，也可以同时修改rsp的地址，使程序形成一个chian，从而通过srop实现更多的功能</p>
 <p>利用srop需要几个条件：</p>
 <pre><code>1.程序存在栈溢出漏洞
-2.知道栈地址或者可以只要需要使用字符串的地址等
+2.知道栈地址或者可以知道需要使用字符串的地址等
 3.知道sigreturn的地址
 3.知道syscall的地址或者syscall gadget地址
 </code></pre><h3 id="0x03漏洞利用"><a href="#0x03漏洞利用" class="headerlink" title="0x03漏洞利用"></a>0x03漏洞利用</h3><p>上面介绍了srop的原理，我们可以使用上面的原理来利用smallest这个pwn题<br>这个题满足上面的几个条件:</p>
@@ -389,11 +389,11 @@ p.interactive()
 			
 		
 			
-				<li><a href="/tags/pwn/" title="pwn">pwn<sup>1</sup></a></li>
+				<li><a href="/tags/g/" title="g++">g++<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/srop/" title="srop">srop<sup>1</sup></a></li>
+				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
 			
 		
 			
@@ -405,7 +405,7 @@ p.interactive()
 			
 		
 			
-				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
+				<li><a href="/tags/srop/" title="srop">srop<sup>1</sup></a></li>
 			
 		
 			
@@ -417,7 +417,7 @@ p.interactive()
 			
 		
 			
-				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
+				<li><a href="/tags/pwn/" title="pwn">pwn<sup>1</sup></a></li>
 			
 		
 			
@@ -425,7 +425,7 @@ p.interactive()
 			
 		
 			
-				<li><a href="/tags/g/" title="g++">g++<sup>1</sup></a></li>
+				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
 			
 		
 		</ul>
