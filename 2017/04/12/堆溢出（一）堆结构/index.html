@@ -34,7 +34,7 @@
 <meta property="og:image" content="http://img.blog.csdn.net/20170309222222816?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170309222300738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170309222319148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-04-13T13:28:56.000Z">
+<meta property="og:updated_time" content="2017-05-05T08:15:27.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="堆溢出（一）堆结构">
 <meta name="twitter:description" content="本系列文章讲述了windows 2000 下 堆溢出的方法">
@@ -120,21 +120,19 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x000-环境"><span class="toc-number">1.</span> <span class="toc-text">0x000 环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x001-堆中的数据结构"><span class="toc-number">2.</span> <span class="toc-text">0x001 堆中的数据结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x003总结和分析"><span class="toc-number">3.</span> <span class="toc-text">0x003总结和分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x004-参考书籍"><span class="toc-number">4.</span> <span class="toc-text">0x004 参考书籍</span></a></li></ol>
 		
 		</div>
 		
 		<p>本系列文章讲述了windows 2000 下 堆溢出的方法</p>
 <hr>
 <a id="more"></a>
-<p>###0x000 环境</p>
-<ul>
+<h3 id="0x000-环境"><a href="#0x000-环境" class="headerlink" title="0x000 环境"></a>0x000 环境</h3><ul>
 <li>虚拟机         VirtualBox 5.0.20</li>
 <li>系统        windows 2000</li>
 <li>工具        VC++6.0    OllyDbg 1.10 汉化版</li>
 </ul>
-<p>###0x001 堆中的数据结构</p>
-<ol>
+<h3 id="0x001-堆中的数据结构"><a href="#0x001-堆中的数据结构" class="headerlink" title="0x001 堆中的数据结构"></a>0x001 堆中的数据结构</h3><ol>
 <li>堆块<br>1）    堆块分为块首和块身<br>2）    块首大小为（8字节）<br><img src="http://img.blog.csdn.net/20170308221103759?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""><br>注：flag 01 表示堆块占用<br>3）    空闲态的堆块在块首后有两个指针 </li>
 <li>堆表（空表和快表）<br>1）    空表：双向回环链表<br>2）    快表：单向链表<br>3）    区别<br>a)    以上两个都为128大小的指针数组 （空表每一项有两个指针，快表每一项有一个指针）<br>b)    快表最多只有四个节点<br>c)    空表除了数组的第一个元素外其他分别链接：数组下标*8 大小的堆块，数组的第一个元素链接着大于1kb的堆块，并升序排序<br>d)    快表的堆块处于占用状态，不会发生堆块合并<br>e)    快表的只存在精确分配，快表优先空表分配</li>
 <li>内存块的大小</li>
@@ -174,9 +172,8 @@
 <p>e)    再次分配第五快内存，这次是从空表中free[2]中分配的。<br> <img src="http://img.blog.csdn.net/20170309222300738?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>f)    再次分配，一块16字节大小的内存块之后，堆中变化如下图（选中部分为新分配的内存块），因为快表中lookaside[3]为空，并且空表free[3]也为空，所有从free[0]中”切割”出现”找零钱”现象。<br> <img src="http://img.blog.csdn.net/20170309222319148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjEyMTA5OTU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p>4）     堆表分配和释放总结<br>由以上实验证明，在有快表的时候，分配小块内存，优先分配快表，再在空表中分配，释放与分配相反，优先链接快表，在快表满了以后，在链接空表。在没有快表的时候，直接使用空表分配，释放后链接到空表中。</p>
-<p>###0x003总结和分析</p>
-<p>通过两次的实验可以巩固对堆结构的理解和堆管理的方式的学习，为下一步的堆溢出做准备，通过自己的理解去构造程序去分析堆结构，可以进一步的加深自己对知识的理解。<br>注：<br>问题1：<br>对堆结构的分析发现不管是空表还是块表free[1]好像都没有被用到，不会有堆块链接到上面（这是我的疑问没有得出结果）。<br>问题2：<br>lookaside[1]链接的到底是8字节大小的堆块，还是16字节大小的，这个需要读了WRK源码可能才会知道。</p>
-<p>###0x004 参考书籍<br>1．    0day安全 软件漏洞分析技术 （第二版）<br>2．    软件调试</p>
+<h3 id="0x003总结和分析"><a href="#0x003总结和分析" class="headerlink" title="0x003总结和分析"></a>0x003总结和分析</h3><p>通过两次的实验可以巩固对堆结构的理解和堆管理的方式的学习，为下一步的堆溢出做准备，通过自己的理解去构造程序去分析堆结构，可以进一步的加深自己对知识的理解。<br>注：<br>问题1：<br>对堆结构的分析发现不管是空表还是块表free[1]好像都没有被用到，不会有堆块链接到上面（这是我的疑问没有得出结果）。<br>问题2：<br>lookaside[1]链接的到底是8字节大小的堆块，还是16字节大小的，这个需要读了WRK源码可能才会知道。</p>
+<h3 id="0x004-参考书籍"><a href="#0x004-参考书籍" class="headerlink" title="0x004 参考书籍"></a>0x004 参考书籍</h3><p>1．    0day安全 软件漏洞分析技术 （第二版）<br>2．    软件调试</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -231,7 +228,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x000-环境"><span class="toc-number">1.</span> <span class="toc-text">0x000 环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x001-堆中的数据结构"><span class="toc-number">2.</span> <span class="toc-text">0x001 堆中的数据结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x003总结和分析"><span class="toc-number">3.</span> <span class="toc-text">0x003总结和分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x004-参考书籍"><span class="toc-number">4.</span> <span class="toc-text">0x004 参考书籍</span></a></li></ol>
  
   </div>
 
@@ -256,7 +253,7 @@
 		  
 		
 		  
-			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>4</sup></a></li>
+			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>5</sup></a></li>
 		  
 		
 		  
@@ -281,6 +278,22 @@
 			
 		
 			
+				<li><a href="/tags/pwn/" title="pwn">pwn<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/srop/" title="srop">srop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/gcc/" title="gcc">gcc<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
 			
 		
@@ -293,23 +306,15 @@
 			
 		
 			
+				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/ctf/" title="ctf">ctf<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/gcc/" title="gcc">gcc<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/g/" title="g++">g++<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
 			
 		
 		</ul>
