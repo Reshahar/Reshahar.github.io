@@ -12,13 +12,13 @@
 
     
     <meta name="description" content="一个非常简单的pwn栈溢出">
-<meta name="keywords" content="pwn,simple,stack-overflow">
+<meta name="keywords" content="pwn,stack-overflow,simple">
 <meta property="og:type" content="article">
 <meta property="og:title" content="2015-casw-precision-100解析">
 <meta property="og:url" content="http://Reshahar.github.io/2017/05/16/2015-casw-precision-100解析/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
 <meta property="og:description" content="一个非常简单的pwn栈溢出">
-<meta property="og:updated_time" content="2017-05-18T14:50:46.000Z">
+<meta property="og:updated_time" content="2017-05-18T15:05:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2015-casw-precision-100解析">
 <meta name="twitter:description" content="一个非常简单的pwn栈溢出">
@@ -282,8 +282,8 @@ Got 1�Qh//shh/bin\x89��\x83��\x80AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 $ id
 uid=0(root) gid=0(root) groups=0(root)
 $ 
-</code></pre><h3 id="0x03总结"><a href="#0x03总结" class="headerlink" title="0x03总结"></a>0x03总结</h3><pre><code>pwn这类的题经验还是很重要的，有的时候会事半功倍，而只有多做题才能增加自己的经验。
-</code></pre><h3 id="0x04参考"><a href="#0x04参考" class="headerlink" title="0x04参考"></a>0x04参考</h3><p>[1]:<a href="http://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html</a> 浮点数的二进制表示<br>[2]:<a href="http://blog.csdn.net/xiaominthere/article/details/17287965" target="_blank" rel="external">http://blog.csdn.net/xiaominthere/article/details/17287965</a> Linux系统调用 int 80h int 0x80<br>[3]:<a href="http://www.evil0x.com/posts/9492.html" target="_blank" rel="external">http://www.evil0x.com/posts/9492.html</a> kali2.0 : msfpayload和msfencode的集成版msfvenom 使用简介</p>
+</code></pre><h3 id="0x03总结"><a href="#0x03总结" class="headerlink" title="0x03总结"></a>0x03总结</h3><p>pwn这类的题经验还是很重要的，有的时候会事半功倍，而只有多做题才能增加自己的经验。</p>
+<h3 id="0x04参考"><a href="#0x04参考" class="headerlink" title="0x04参考"></a>0x04参考</h3><p>[1]:<a href="http://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html</a> 浮点数的二进制表示<br>[2]:<a href="http://blog.csdn.net/xiaominthere/article/details/17287965" target="_blank" rel="external">http://blog.csdn.net/xiaominthere/article/details/17287965</a> Linux系统调用 int 80h int 0x80<br>[3]:<a href="http://www.evil0x.com/posts/9492.html" target="_blank" rel="external">http://www.evil0x.com/posts/9492.html</a> kali2.0 : msfpayload和msfencode的集成版msfvenom 使用简介</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -297,7 +297,7 @@ $
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/simple/">simple</a><a href="/tags/stack-overflow/">stack-overflow</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/stack-overflow/">stack-overflow</a><a href="/tags/simple/">simple</a>
   </div>
 
 </div>
@@ -327,6 +327,14 @@ $
 </a>
 </div>
 
+
+<div class="next">
+<a href="/2017/05/18/pwnable-rw-start分析与折腾/"  title="pwnable.rw-start分析与折腾">
+ <strong>下一篇：</strong><br/> 
+ <span>pwnable.rw-start分析与折腾
+</span>
+</a>
+</div>
 
 </nav>
 
@@ -400,27 +408,7 @@ $
 			
 		
 			
-				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/rop/" title="rop">rop<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ctf/" title="ctf">ctf<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/simple/" title="simple">simple<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/srop/" title="srop">srop<sup>1</sup></a></li>
 			
 		
 			
@@ -432,7 +420,23 @@ $
 			
 		
 			
-				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
+				<li><a href="/tags/srop/" title="srop">srop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/simple/" title="simple">simple<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ctf/" title="ctf">ctf<sup>1</sup></a></li>
 			
 		
 			
@@ -441,6 +445,10 @@ $
 		
 			
 				<li><a href="/tags/django/" title="django">django<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
 			
 		
 		</ul>
