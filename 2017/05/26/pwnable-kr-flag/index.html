@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>python django 简单总结 | Reshahar的博客</title>
+    <title>pwnable.kr flag | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="python django 的一些小问题的解决办法">
-<meta name="keywords" content="python,django">
+    <meta name="description" content="pwnable.kr 上的第四道题">
+<meta name="keywords" content="pwn,pwnable.kr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="python django 简单总结">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/17/python-django-简单总结/index.html">
+<meta property="og:title" content="pwnable.kr flag">
+<meta property="og:url" content="http://Reshahar.github.io/2017/05/26/pwnable-kr-flag/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="python django 的一些小问题的解决办法">
-<meta property="og:updated_time" content="2017-04-17T08:55:57.724Z">
+<meta property="og:description" content="pwnable.kr 上的第四道题">
+<meta property="og:updated_time" content="2017-05-27T14:49:48.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="python django 简单总结">
-<meta name="twitter:description" content="python django 的一些小问题的解决办法">
+<meta name="twitter:title" content="pwnable.kr flag">
+<meta name="twitter:description" content="pwnable.kr 上的第四道题">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/17/python-django-简单总结/" title="python django 简单总结" itemprop="url">python django 简单总结</a>
+      <a href="/2017/05/26/pwnable-kr-flag/" title="pwnable.kr flag" itemprop="url">pwnable.kr flag</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-17T08:48:11.000Z" itemprop="datePublished"> 发表于 2017-04-17</time>
+    <time datetime="2017-05-26T13:54:44.000Z" itemprop="datePublished"> 发表于 2017-05-26</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,41 +103,49 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li></ol>
 		
 		</div>
 		
-		<p>python django 的一些小问题的解决办法</p>
-<a id="more"></a>
+		<p>pwnable.kr 上的第四道题</p>
 <hr>
-<p>1.创建网站</p>
-<pre><code>django-admin startproject 项目名
-</code></pre><p>2.创建一个app(创建完网站先进入网站的目录)</p>
-<pre><code>django-admin startapp app名
-</code></pre><p>3.运行网站</p>
-<pre><code>python manage.py runserver 地址:端口
-</code></pre><p>4.导入已经存在的数据库</p>
-<pre><code>python manage.py inspectdb &gt;App路径/models.py
-</code></pre><p>5.将models中的类生成migrations（适用于自己写model在导入数据库）</p>
-<pre><code>python manage.py makemigrations
-将上面生成的结果导入数据库
-python manage.py migrate
-</code></pre><p>6.自定义自增主键</p>
-<pre><code>在自己要定义的自增主键中添加（primary_key=True）
-</code></pre>  
+<a id="more"></a>
+<h3 id="0x00-分析"><a href="#0x00-分析" class="headerlink" title="0x00 分析"></a>0x00 分析</h3><p>题目中说“This is reversing task. all you need is binary”，这是一个逆向任务，首先把文件下下来，放到IDA中分析，代码很简单，但是比较乱，因为说逆向，就去看看了字符串，看到可以字符串upx，原来加壳了</p>
+<pre><code>LOAD:000000000044A695 aUpx_sf_net     db &apos;//upx.sf.net $&apos;,0Ah,0
+LOAD:000000000044A6A5                 db 24h, 49h, 64h
+LOAD:000000000044A6A8                 dq &apos;.3 XPU :&apos;, &apos;rypoC 80&apos;, &apos;)C( thgi&apos;, &apos;02-6991 &apos;
+LOAD:000000000044A6C8                 db 2 dup(31h), 20h, 74h, 68h, 65h, 20h
+</code></pre><p>upx壳去linux upx -d 直接脱掉，在拖进IDA就行了</p>
+<pre><code>int __cdecl main(int argc, const char **argv, const char **envp)
+{
+    __int64 v3; // rax@1
+
+    puts(4810328LL, argv, envp);
+    LODWORD(v3) = malloc(100LL);
+    sub_400320(v3, flag);
+    return 0;
+}
+</code></pre><p>主要代码还是sub_400320这个函数里，分配内存了，可能有溢出，习惯的看了一个参数flag</p>
+<pre><code>.data:00000000006C2070                 public flag
+.data:00000000006C2070 flag            dq offset aUpx___?SoundsL ; DATA XREF: main+20r
+.data:00000000006C2070                                         ; &quot;UPX...? sounds like a delivery service &quot;...
+.data:00000000006C2078                 align 20h
+</code></pre><p>哇，根据之前的经验，这个和flag很像的，提交一下，正确</p>
+<h3 id="0x01-总结"><a href="#0x01-总结" class="headerlink" title="0x01 总结"></a>0x01 总结</h3><p>积累的经验有时，也是很重要的</p>
+  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/web/">web</a>
+  <a class="article-category-link" href="/categories/ctf-pwn/">ctf-pwn</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/python/">python</a><a href="/tags/django/">django</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/pwnable-kr/">pwnable.kr</a>
   </div>
 
 </div>
@@ -146,7 +154,7 @@ python manage.py migrate
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/17/python-django-简单总结/" data-title="python django 简单总结 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/05/26/pwnable-kr-flag/" data-title="pwnable.kr flag | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -160,21 +168,13 @@ python manage.py migrate
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/Linux x86 栈溢出/" title="linux x86 栈溢出">
+ <a href="/2017/05/25/pwnable-kr-bof/" title="pwnable.kr之bof">
   <strong>上一篇：</strong><br/>
   <span>
-  linux x86 栈溢出</span>
+  pwnable.kr之bof</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/05/04/360春秋杯smallest-pwn的学习与利用/"  title="360春秋杯smallest-pwn的学习与利用">
- <strong>下一篇：</strong><br/> 
- <span>360春秋杯smallest-pwn的学习与利用
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -186,7 +186,7 @@ python manage.py migrate
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li></ol>
  
   </div>
 
