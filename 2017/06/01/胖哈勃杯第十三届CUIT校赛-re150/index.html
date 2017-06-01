@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Kali 64位 安装32位库并编译程序 | Reshahar的博客</title>
+    <title>胖哈勃杯第十三届CUIT校赛之re150 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="Kali 安装32位库">
-<meta name="keywords" content="linux,gcc,g++">
+    <meta name="description" content="150分的逆向题">
+<meta name="keywords" content="ctf,re">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Kali 64位 安装32位库并编译程序">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/Kali 64位 安装32位库并编译程序/index.html">
+<meta property="og:title" content="胖哈勃杯第十三届CUIT校赛之re150">
+<meta property="og:url" content="http://Reshahar.github.io/2017/06/01/胖哈勃杯第十三届CUIT校赛-re150/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="Kali 安装32位库">
-<meta property="og:updated_time" content="2017-04-13T14:08:58.000Z">
+<meta property="og:description" content="150分的逆向题">
+<meta property="og:updated_time" content="2017-06-01T11:05:44.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Kali 64位 安装32位库并编译程序">
-<meta name="twitter:description" content="Kali 安装32位库">
+<meta name="twitter:title" content="胖哈勃杯第十三届CUIT校赛之re150">
+<meta name="twitter:description" content="150分的逆向题">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/13/Kali 64位 安装32位库并编译程序/" title="Kali 64位 安装32位库并编译程序" itemprop="url">Kali 64位 安装32位库并编译程序</a>
+      <a href="/2017/06/01/胖哈勃杯第十三届CUIT校赛-re150/" title="胖哈勃杯第十三届CUIT校赛之re150" itemprop="url">胖哈勃杯第十三届CUIT校赛之re150</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T13:54:24.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+    <time datetime="2017-06-01T08:24:00.000Z" itemprop="datePublished"> 发表于 2017-06-01</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,14 +103,80 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-参考"><span class="toc-number">3.</span> <span class="toc-text">0x02 参考</span></a></li></ol>
 		
 		</div>
 		
-		<p>Kali 安装32位库</p>
+		<p>150分的逆向题</p>
 <hr>
 <a id="more"></a>
-<p>1.启用兼容模式<br>    dpkg –add-architecture i386<br>2.升级一下<br>    apt-get update<br>3.安装<br>    apt-get install libc6:i386<br>下面编译环境安装，否则可能报错<br>    apt-get install gcc-multilib<br>    apt-get install g++-multilib</p>
+<h3 id="0x00-分析"><a href="#0x00-分析" class="headerlink" title="0x00 分析"></a>0x00 分析</h3><p>题目相关文件：<a href="https://github.com/Reshahar/BlogFile/tree/master/2017-cuit-re150_1" target="_blank" rel="external">https://github.com/Reshahar/BlogFile/tree/master/2017-cuit-re150_1</a></p>
+<p>这是linux下的逆向，还是先拖到IDA里看看吧</p>
+<pre><code>void start()
+{
+int v0; // eax@1
+int v1; // ecx@1
+int v2; // esi@1
+
+v0 = sys_write(1, &amp;unk_80488E2, 9u);
+v1 = unk_80488DE;
+v2 = 0;
+do
+{
+    *((_BYTE *)nullsub_1 + v2) = ((unsigned __int8)(*((_BYTE *)nullsub_1 + v2) ^ 0x42) &gt;&gt; 3) | 32
+                                                                                            * (*((_BYTE *)nullsub_1 + v2) ^ 0x42);
+    ++v2;
+    --v1;
+}
+while ( v1 );
+JUMPOUT(__CS__, nullsub_1);
+}
+</code></pre><p>start开始看的有点蒙圈的，后来查看汇编发现其实这是自己实现的一个解密代码，就是将每个字符的异或0x42再将它的底三位和高五位换位</p>
+<pre><code>.eh_frame:0804892B loc_804892B:                            
+.eh_frame:0804892B                 mov     bl, 0
+.eh_frame:0804892D                 mov     al, [edi+esi]
+.eh_frame:08048930                 xor     al, 42h
+.eh_frame:08048932                 shl     al, 5
+.eh_frame:08048935                 or      bl, al
+.eh_frame:08048937                 mov     al, [edi+esi]
+.eh_frame:0804893A                 xor     al, 42h
+.eh_frame:0804893C                 shr     al, 3
+.eh_frame:0804893F                 or      bl, al
+.eh_frame:08048941                 mov     [edi+esi], bl
+.eh_frame:08048944                 inc     esi
+.eh_frame:08048945                 loop    **loc_804892B**
+</code></pre><p>这里也不用自己解密，直接使用gdb在loop之后下断点，然后单步运行就能到解密后代码的地方，然后使用dump命令将这块代码dump下来，可以使用IDA分析，都是汇编代码，有些地址调用是错的，可读性很差，然后对照着代码，使用gdb分析前期的算法分析出来部分，但是看了一下后面还有狠多，脑袋疼，gdb调试程序，效果并不是很好，后来想起来edb，类似windows下的OD图形的，可以同时观察内存，栈上的数据，很方便，之前的逻辑已经比较清晰了，使用edb调试，下几个断点，很快就分析出了算法</p>
+<p>整体算法是这样的：</p>
+<p>将输入的字符右移x位，或上，这个字符左移8-x位（和上面解密的算法差不多的），其中x等于当前字符下标与上7，然后在异或上当前字符下标，然后在异或上32 ，最后和内存中0x080499ec地址的值比较</p>
+<p>根据上面的算法，直接将0x080499ec地址dump出来，然后写脚本如下：</p>
+<pre><code>list = [0x73,0x8d,0xf2,0x4c ,0xc7 ,0xd4 ,0x7b ,0xf7 ,0x18 ,0x32 ,0x71 ,0x0d ,0xcf ,0xdc ,0x67 ,0x4f,0x7f,0x0b ,0x6d]
+ret=[]
+
+for i in list:
+    ret.append(hex(i^32))
+k = 0
+x = 0
+flag = &apos;&apos;
+for i in ret:
+    for j in range(0,256):
+        x = k &amp; 7
+        z = ((j&gt;&gt;x)|(j&lt;&lt;(8-x)))
+        y = z^k
+        y = y%256
+        #print y
+        if y==int(i,16):
+            flag+=chr(j)
+    k = k+1
+print flag
+</code></pre><p>运行结果如下:</p>
+<pre><code>SYC{&gt;&gt;Wh06m1&gt;&gt;R0Ot}
+</code></pre><p>验证一下：</p>
+<pre><code>root@kali:~/D/re# ./re150 
+syclover
+SYC{&gt;&gt;Wh06m1&gt;&gt;R0Ot}
+right
+</code></pre><h3 id="0x01-总结"><a href="#0x01-总结" class="headerlink" title="0x01 总结"></a>0x01 总结</h3><p>工具可以换着用，不要总依赖一个工具 </p>
+<h3 id="0x02-参考"><a href="#0x02-参考" class="headerlink" title="0x02 参考"></a>0x02 参考</h3><p>[1]:<a href="http://blog.csdn.net/yasi_xi/article/details/18399731" target="_blank" rel="external">http://blog.csdn.net/yasi_xi/article/details/18399731</a> gdb dump binary memory to file</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,13 +184,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/其它/">其它</a>
+  <a class="article-category-link" href="/categories/ctf-re/">ctf-re</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/gcc/">gcc</a><a href="/tags/g/">g++</a>
+  <span></span> <a href="/tags/ctf/">ctf</a><a href="/tags/re/">re</a>
   </div>
 
 </div>
@@ -133,7 +199,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/13/Kali 64位 安装32位库并编译程序/" data-title="Kali 64位 安装32位库并编译程序 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/06/01/胖哈勃杯第十三届CUIT校赛-re150/" data-title="胖哈勃杯第十三届CUIT校赛之re150 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -147,21 +213,13 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/脱壳/" title="脱壳">
+ <a href="/2017/05/30/胖哈勃杯第十三届CUIT校赛-re100/" title="胖哈勃杯第十三届CUIT校赛之re100">
   <strong>上一篇：</strong><br/>
   <span>
-  脱壳</span>
+  胖哈勃杯第十三届CUIT校赛之re100</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/04/13/一个简单的逆向/"  title="一个简单的逆向">
- <strong>下一篇：</strong><br/> 
- <span>一个简单的逆向
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -173,7 +231,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-参考"><span class="toc-number">3.</span> <span class="toc-text">0x02 参考</span></a></li></ol>
  
   </div>
 
