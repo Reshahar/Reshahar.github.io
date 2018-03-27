@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Reshahar的博客">
 <meta property="og:description" content="hxb的pwn1">
 <meta property="og:image" content="http://reshahar.github.io/img/hxb/pwn1/01.png">
-<meta property="og:updated_time" content="2017-12-05T02:03:50.957Z">
+<meta property="og:updated_time" content="2017-12-05T02:04:42.745Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hxb的pwn1">
 <meta name="twitter:description" content="hxb的pwn1">
@@ -267,8 +267,6 @@ inferiors num     切换调试进程
 <pre><code>root@ubuntu:~/pwn# python pattern.py create 384
 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7
 
-
-
 [──────────────────────────────────REGISTERS───────────────────────────────────]
 *EAX  0x36694135 (&apos;5Ai6&apos;)
  EBX  0x0
@@ -378,6 +376,14 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 </div>
 
 
+<div class="next">
+<a href="/2018/03/27/2018强网杯pwn之opm解题思路/"  title="2018强网杯pwn之opm解题思路">
+ <strong>下一篇：</strong><br/> 
+ <span>2018强网杯pwn之opm解题思路
+</span>
+</a>
+</div>
+
 </nav>
 
 	
@@ -405,7 +411,7 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 		<ul>
 		
 		  
-			<li><a href="/categories/ctf-pwn/" title="ctf-pwn">ctf-pwn<sup>11</sup></a></li>
+			<li><a href="/categories/ctf-pwn/" title="ctf-pwn">ctf-pwn<sup>12</sup></a></li>
 		  
 		
 		  
@@ -438,7 +444,7 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/pwn/" title="pwn">pwn<sup>11</sup></a></li>
+				<li><a href="/tags/pwn/" title="pwn">pwn<sup>12</sup></a></li>
 			
 		
 			
@@ -458,6 +464,10 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 			
 		
 			
+				<li><a href="/tags/栈溢出/" title="栈溢出">栈溢出<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/逆向/" title="逆向">逆向<sup>2</sup></a></li>
 			
 		
@@ -466,15 +476,15 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 			
 		
 			
-				<li><a href="/tags/simple/" title="simple">simple<sup>1</sup></a></li>
+				<li><a href="/tags/gcc/" title="gcc">gcc<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/栈溢出/" title="栈溢出">栈溢出<sup>1</sup></a></li>
+				<li><a href="/tags/g/" title="g++">g++<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/stack-canary/" title="stack canary">stack canary<sup>1</sup></a></li>
+				<li><a href="/tags/leak地址/" title="leak地址">leak地址<sup>1</sup></a></li>
 			
 		
 			
@@ -482,19 +492,11 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 			
 		
 			
-				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
+				<li><a href="/tags/stack-canary/" title="stack canary">stack canary<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/other/" title="other">other<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/asm-program/" title="asm_program">asm_program<sup>1</sup></a></li>
+				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
 			
 		
 			
@@ -506,15 +508,19 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 			
 		
 			
+				<li><a href="/tags/other/" title="other">other<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asm-program/" title="asm_program">asm_program<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/simple/" title="simple">simple<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/srop/" title="srop">srop<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/gcc/" title="gcc">gcc<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/g/" title="g++">g++<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -569,7 +575,7 @@ binsh_addr = fork_addr - libc.symbols[&apos;fork&apos;]+next(libc.search(&quot;/
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/" target="_blank" title="Reshahar">Reshahar</a>
 		
