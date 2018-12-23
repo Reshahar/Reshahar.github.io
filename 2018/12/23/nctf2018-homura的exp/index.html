@@ -18,7 +18,7 @@
 <meta property="og:url" content="http://Reshahar.github.io/2018/12/23/nctf2018-homura的exp/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
 <meta property="og:description" content="nctf2018的pwn题homura的exp思路及脚本">
-<meta property="og:updated_time" content="2018-12-23T04:29:07.615Z">
+<meta property="og:updated_time" content="2018-12-23T04:32:51.774Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nctf2018-homura的exp">
 <meta name="twitter:description" content="nctf2018的pwn题homura的exp思路及脚本">
@@ -110,7 +110,7 @@
 		<p>nctf2018的pwn题homura的exp思路及脚本</p>
 <hr>
 <a id="more"></a>
-<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>1.通过name泄露heap地址<br>2.通过伪造劫持unsorted bin的bk伪造堆块到small-bins中<br>3.控制堆上的name和buf指针，leak libc 和 wirte free_hook</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>1.通过name泄露heap地址<br>2.通过伪造劫持unsorted bin的bk伪造堆块到small-bins中（未校验fd指针也就是双向链表的合法性）<br>3.控制堆上的name和buf指针，leak libc 和 wirte free_hook</p>
 <h3 id="完整exp"><a href="#完整exp" class="headerlink" title="完整exp"></a>完整exp</h3><pre><code>from pwn import *
 
 def ru(data,drop=False):
