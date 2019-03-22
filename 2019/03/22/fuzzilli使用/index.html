@@ -1,0 +1,577 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>fuzzilli使用 | Reshahar的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Reshahar">
+    
+
+    
+    <meta name="description" content="简介开源的一款JavaScript的模糊测试工具，由SamuelGroß编写，使用swift语言开发。链接：https://github.com/googleprojectzero/fuzzilli/">
+<meta name="keywords" content="fuzz,browser,webkit,v8,firefox">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fuzzilli使用">
+<meta property="og:url" content="http://Reshahar.github.io/2019/03/22/fuzzilli使用/index.html">
+<meta property="og:site_name" content="Reshahar的博客">
+<meta property="og:description" content="简介开源的一款JavaScript的模糊测试工具，由SamuelGroß编写，使用swift语言开发。链接：https://github.com/googleprojectzero/fuzzilli/">
+<meta property="og:updated_time" content="2019-03-22T09:13:34.802Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fuzzilli使用">
+<meta name="twitter:description" content="简介开源的一款JavaScript的模糊测试工具，由SamuelGroß编写，使用swift语言开发。链接：https://github.com/googleprojectzero/fuzzilli/">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Reshahar的博客" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Reshahar的博客" title="Reshahar的博客"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Reshahar的博客">Reshahar的博客</a></h1>
+				<h2 class="blog-motto">世界上没有绝对安全的系统</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">文章</a></li>
+					
+						<li><a href="/">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:Reshahar.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/22/fuzzilli使用/" title="fuzzilli使用" itemprop="url">fuzzilli使用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/" title="Reshahar" target="_blank" itemprop="author">Reshahar</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-22T09:10:52.000Z" itemprop="datePublished"> 发表于 2019-03-22</time>
+      
+     &nbsp
+     <span id="busuanzi_container_page_pv" style="display:none">
+    阅读<span id="busuanzi_value_page_pv"></span>次
+    </span>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ubuntu-16-04使用"><span class="toc-number">2.</span> <span class="toc-text">ubuntu 16.04使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装swift"><span class="toc-number">2.1.</span> <span class="toc-text">安装swift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#下载编译fuzzilli"><span class="toc-number">2.2.</span> <span class="toc-text">下载编译fuzzilli</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#下载编译webkit"><span class="toc-number">2.3.</span> <span class="toc-text">下载编译webkit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行fuzzilli"><span class="toc-number">2.4.</span> <span class="toc-text">运行fuzzilli</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a><strong>简介</strong></h2><p>开源的一款JavaScript的模糊测试工具，由SamuelGroß编写，使用swift语言开发。<br>链接：<a href="https://github.com/googleprojectzero/fuzzilli/" target="_blank" rel="external">https://github.com/googleprojectzero/fuzzilli/</a></p>
+<hr>
+<a id="more"></a>
+<h2 id="ubuntu-16-04使用"><a href="#ubuntu-16-04使用" class="headerlink" title="ubuntu 16.04使用"></a><strong>ubuntu 16.04使用</strong></h2><h3 id="安装swift"><a href="#安装swift" class="headerlink" title="安装swift"></a><strong>安装swift</strong></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">apt-get install clang-4.0 clang++-4.0 libicu-dev</div><div class="line">ln /usr/bin/clang-4.0 /usr/bin/clang</div><div class="line">ln /usr/bin/clang++-4.0 /usr/bin/clang++</div></pre></td></tr></table></figure>
+<p>去官网<a href="https://swift.org下载最新的匹配ubuntu的版本，这里下载的是16.04版本，使用wget下载" target="_blank" rel="external">https://swift.org下载最新的匹配ubuntu的版本，这里下载的是16.04版本，使用wget下载</a></p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget https://swift.org/builds/swift-<span class="number">4.2</span><span class="meta">.3</span>-release/ubuntu1604/swift-<span class="number">4.2</span><span class="meta">.3</span>-RELEASE/swift-<span class="number">4.2</span><span class="meta">.3</span>-RELEASE-ubuntu16<span class="meta">.04</span>.tar.gz</div></pre></td></tr></table></figure>
+<p>下载之后进行解压</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir ~/swift</div><div class="line">tar -xvzf swift<span class="number">-4.2</span><span class="number">.3</span>-RELEASE-ubuntu16<span class="number">.04</span>.tar.gz -C ~/swift</div></pre></td></tr></table></figure>
+<p>添加环境变量路径，</p>
+<p>1.执行如下命令</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export PATH=<span class="regexp">~/swift/</span>swift<span class="number">-4.2</span><span class="number">.3</span>-RELEASE-ubuntu16<span class="number">.04</span><span class="regexp">/usr/</span><span class="string">bin:</span>$PATH</div></pre></td></tr></table></figure>
+<p>2.在~/.bashrc文件添加上面的代码并运行如下代码</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">source</span> ~/.bashrc</div></pre></td></tr></table></figure>
+<h3 id="下载编译fuzzilli"><a href="#下载编译fuzzilli" class="headerlink" title="下载编译fuzzilli"></a><strong>下载编译fuzzilli</strong></h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> <span class="title">https</span>://github.com/googleprojectzero/fuzzilli.git</div><div class="line">cd fuzzilli</div><div class="line">swift build -c release -<span class="attr">Xlinker=</span>'-lrt'</div></pre></td></tr></table></figure>
+<h3 id="下载编译webkit"><a href="#下载编译webkit" class="headerlink" title="下载编译webkit"></a><strong>下载编译webkit</strong></h3><p>从github上clone下载，在切换到指定提交记录了，然后打上给的patch文件</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/WebKit/webkit</div><div class="line">git checkout <span class="number">8</span>d<span class="number">7</span><span class="keyword">c</span><span class="number">264869</span>ecbdd<span class="number">56</span>fb<span class="number">46</span>aa<span class="number">5762</span>d<span class="number">82</span><span class="keyword">c</span><span class="number">318</span>f<span class="number">39</span>feb -b fuzz  </div><div class="line">patch  -p<span class="number">1</span> &lt; webkit.patch</div><div class="line">cp fuzzilli/Targets/JavaScriptCore/fuzzbuild.sh . </div><div class="line">./fuzzbuild.sh</div></pre></td></tr></table></figure>
+<p>如果 clone 失败可以使用如下方法，第一次只拉取最新的一次提交版本，第二次在获取全部版本，具体命令如下：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> <span class="title">--depth</span>=<span class="number">1</span> https://github.com/WebKit/webkit</div><div class="line">git fetch --unshallow</div></pre></td></tr></table></figure>
+<p>官方的编译方式可以参考如下：<a href="https://trac.webkit.org/wiki/BuildingGtk" target="_blank" rel="external">https://trac.webkit.org/wiki/BuildingGtk</a></p>
+<h3 id="运行fuzzilli"><a href="#运行fuzzilli" class="headerlink" title="运行fuzzilli"></a><strong>运行fuzzilli</strong></h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sysctl -w <span class="string">'kernel.core_pattern=|/bin/false'</span>  <span class="comment">//首次运行</span></div><div class="line">swift run -c release -Xlinker=<span class="string">'-lrt'</span> FuzzilliCli --profile=jsc <span class="regexp">/webkit/</span>FuzzBuild<span class="regexp">/Debug/</span>bin/jsc</div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>此工具只能fuzz开源的Js引擎，并且需要修改一定的源代码。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><strong>参考</strong></h2><ol>
+<li><a href="https://medium.com/@agavatar/open-source-swift-on-ubuntu-linux-cd00e697dff0" target="_blank" rel="external">https://medium.com/@agavatar/open-source-swift-on-ubuntu-linux-cd00e697dff0</a></li>
+<li><a href="https://trac.webkit.org/wiki/BuildingGtk" target="_blank" rel="external">https://trac.webkit.org/wiki/BuildingGtk</a></li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/browser/">browser</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/fuzz/">fuzz</a><a href="/tags/browser/">browser</a><a href="/tags/webkit/">webkit</a><a href="/tags/v8/">v8</a><a href="/tags/firefox/">firefox</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://Reshahar.github.io/2019/03/22/fuzzilli使用/" data-title="fuzzilli使用 | Reshahar的博客" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/12/23/nctf2018-homura的exp/" title="nctf2018-homura的exp">
+  <strong>上一篇：</strong><br/>
+  <span>
+  nctf2018-homura的exp</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ubuntu-16-04使用"><span class="toc-number">2.</span> <span class="toc-text">ubuntu 16.04使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装swift"><span class="toc-number">2.1.</span> <span class="toc-text">安装swift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#下载编译fuzzilli"><span class="toc-number">2.2.</span> <span class="toc-text">下载编译fuzzilli</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#下载编译webkit"><span class="toc-number">2.3.</span> <span class="toc-text">下载编译webkit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行fuzzilli"><span class="toc-number">2.4.</span> <span class="toc-text">运行fuzzilli</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/browser/" title="browser">browser<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ctf-pwn/" title="ctf-pwn">ctf-pwn<sup>14</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ctf-re/" title="ctf-re">ctf-re<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/其它/" title="其它">其它<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/漏洞基础/" title="漏洞基础">漏洞基础<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/逆向工程/" title="逆向工程">逆向工程<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/pwn/" title="pwn">pwn<sup>14</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pwnable-kr/" title="pwnable.kr">pwnable.kr<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/stack-overflow/" title="stack-overflow">stack-overflow<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/漏洞/" title="漏洞">漏洞<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ctf/" title="ctf">ctf<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/栈溢出/" title="栈溢出">栈溢出<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exp/" title="exp">exp<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/heap/" title="heap">heap<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向/" title="逆向">逆向<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/re/" title="re">re<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/gcc/" title="gcc">gcc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/g/" title="g++">g++<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/rop/" title="rop">rop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/溢出/" title="溢出">溢出<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/simple/" title="simple">simple<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/browser/" title="browser">browser<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/webkit/" title="webkit">webkit<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/v8/" title="v8">v8<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/firefox/" title="firefox">firefox<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://github.com" target="_blank" title="github">github</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Reshahar. <br/>
+			Thank you for your support.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/" target="_blank" title="Reshahar">Reshahar</a>
+		
+		
+		&nbsp
+		<span id="busuanzi_container_site_uv" > 
+  		Total <span id="busuanzi_value_site_uv"></span> views.
+		</span>
+
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1261726505'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1261726505%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
+
