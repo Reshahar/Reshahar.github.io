@@ -18,7 +18,7 @@
 <meta property="og:url" content="http://Reshahar.github.io/2019/03/22/fuzzilli使用/index.html">
 <meta property="og:site_name" content="Reshahar的博客">
 <meta property="og:description" content="简介开源的一款JavaScript的模糊测试工具，由SamuelGroß编写，使用swift语言开发。链接：https://github.com/googleprojectzero/fuzzilli/">
-<meta property="og:updated_time" content="2019-03-22T09:13:34.802Z">
+<meta property="og:updated_time" content="2019-03-22T09:27:47.455Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="fuzzilli使用">
 <meta name="twitter:description" content="简介开源的一款JavaScript的模糊测试工具，由SamuelGroß编写，使用swift语言开发。链接：https://github.com/googleprojectzero/fuzzilli/">
@@ -127,7 +127,7 @@
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> <span class="title">--depth</span>=<span class="number">1</span> https://github.com/WebKit/webkit</div><div class="line">git fetch --unshallow</div></pre></td></tr></table></figure>
 <p>官方的编译方式可以参考如下：<a href="https://trac.webkit.org/wiki/BuildingGtk" target="_blank" rel="external">https://trac.webkit.org/wiki/BuildingGtk</a></p>
 <h3 id="运行fuzzilli"><a href="#运行fuzzilli" class="headerlink" title="运行fuzzilli"></a><strong>运行fuzzilli</strong></h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sysctl -w <span class="string">'kernel.core_pattern=|/bin/false'</span>  <span class="comment">//首次运行</span></div><div class="line">swift run -c release -Xlinker=<span class="string">'-lrt'</span> FuzzilliCli --profile=jsc <span class="regexp">/webkit/</span>FuzzBuild<span class="regexp">/Debug/</span>bin/jsc</div></pre></td></tr></table></figure>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>此工具只能fuzz开源的Js引擎，并且需要修改一定的源代码。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>IL中间层语言非常简单易学，此工具可以fuzz开源的Js引擎，但是需要修改一定的源代码。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><strong>参考</strong></h2><ol>
 <li><a href="https://medium.com/@agavatar/open-source-swift-on-ubuntu-linux-cd00e697dff0" target="_blank" rel="external">https://medium.com/@agavatar/open-source-swift-on-ubuntu-linux-cd00e697dff0</a></li>
 <li><a href="https://trac.webkit.org/wiki/BuildingGtk" target="_blank" rel="external">https://trac.webkit.org/wiki/BuildingGtk</a></li>
@@ -292,7 +292,7 @@
 			
 		
 			
-				<li><a href="/tags/rop/" title="rop">rop<sup>1</sup></a></li>
+				<li><a href="/tags/脱壳/" title="脱壳">脱壳<sup>1</sup></a></li>
 			
 		
 			
